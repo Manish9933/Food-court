@@ -89,12 +89,12 @@ const Dashboard = () => {
           color="sky"
         />
         <StatCard 
-          icon={<Users className="text-orange-400" />} 
+          icon={<Users className="text-primary-400" />} 
           label="Total Users" 
           value={stats?.activeUsers || users.length} 
           trend="up" 
           trendValue="2.1"
-          color="orange"
+          color="primary"
         />
         <StatCard 
           icon={<TrendingUp className="text-rose-400" />} 
@@ -108,7 +108,7 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 bg-[#111114] border border-white/5 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-rose-500 opacity-50" />
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-indigo-500 opacity-50" />
           <div className="flex items-center justify-between mb-10">
             <div>
               <h2 className="text-2xl font-black tracking-tight mb-1">Revenue Analytics</h2>
@@ -121,8 +121,8 @@ const Dashboard = () => {
                 <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
@@ -130,9 +130,9 @@ const Dashboard = () => {
                   <YAxis stroke="#52525b" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 700 }} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', color: '#fff' }}
-                    itemStyle={{ color: '#f97316' }}
+                    itemStyle={{ color: '#8b5cf6' }}
                   />
-                  <Area type="monotone" dataKey="revenue" stroke="#f97316" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
+                  <Area type="monotone" dataKey="revenue" stroke="#8b5cf6" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
@@ -144,21 +144,21 @@ const Dashboard = () => {
         <div className="bg-[#111114] border border-white/5 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden flex flex-col">
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-2xl font-black tracking-tight">Recent Orders</h2>
-            <button className="text-xs font-bold text-orange-500 uppercase tracking-widest hover:text-orange-400">View All</button>
+            <button className="text-xs font-bold text-primary-500 uppercase tracking-widest hover:text-primary-400">View All</button>
           </div>
           
           <div className="space-y-6 flex-1">
             {stats?.recentOrders?.map((order) => (
               <div key={order._id} className="flex items-center gap-4 group cursor-pointer" onClick={() => window.location.href='/admin/orders'}>
-                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center shrink-0 group-hover:border-orange-500/20 transition-all">
-                  <ShoppingBag size={20} className="text-zinc-500 group-hover:text-orange-400" />
+                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center shrink-0 group-hover:border-primary-500/20 transition-all">
+                  <ShoppingBag size={20} className="text-zinc-500 group-hover:text-primary-400" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-bold tracking-tight">Order #{order._id.slice(-4).toUpperCase()}</h4>
                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest truncate">{order.items.length} items • ${order.totalAmount} • {order.user?.name}</p>
                 </div>
                 <div className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${
-                  order.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-orange-500/10 text-orange-500'
+                  order.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-primary-500/10 text-primary-500'
                 }`}>
                   {order.status}
                 </div>

@@ -9,6 +9,7 @@ import useCartStore from '../store/useCartStore'
 import useAuthStore from '../store/useAuthStore'
 
 import ThemeToggle from './ThemeToggle'
+import Logo from './Logo'
 
 const Navbar = () => {
   const itemCount = useCartStore((state) => state.getItemCount())
@@ -109,11 +110,8 @@ const Navbar = () => {
               exit={{ opacity: 0, y: 15 }}
               className="w-full flex justify-between items-center h-full"
             >
-              <Link to="/" className="flex items-center gap-3 group">
-                <span className="heading-premium text-3xl primary-gradient-text">FoodGenie</span>
-                <div className="bg-primary-500/10 p-2 rounded-2xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 border border-primary-500/20">
-                  <BrainCircuit size={24} className="text-primary-500" />
-                </div>
+              <Link to="/" className="hover:opacity-90 transition-opacity">
+                <Logo />
               </Link>
 
               <div className="hidden lg:flex gap-2 items-center">

@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom'
 import { FoodContext } from '../context/FoodContext'
 import useCartStore from '../store/useCartStore'
 import { FoodCardSkeleton, CategorySkeleton, HomePageSkeleton } from '../components/Skeleton'
+import Logo from '../components/Logo'
 
 // Icon mapping helper for dynamic categories
 const getCategoryIcon = (name) => {
@@ -59,12 +60,17 @@ const Home = () => {
     .slice(0, 4);
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen relative z-10"
-    >
+    <>
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-500/10 blur-[120px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[150px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="min-h-screen relative z-10"
+      >
       {isLoading ? (
         <HomePageSkeleton />
       ) : (
@@ -405,12 +411,9 @@ const Home = () => {
           <div className="max-w-7xl mx-auto px-6">
              <div className="grid md:grid-cols-4 gap-20 mb-24">
                 <div className="col-span-1 md:col-span-2">
-                   <div className="flex items-center gap-3 mb-10">
-                      <div className="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                        <BrainCircuit className="text-white" size={28} />
-                      </div>
-                      <span className="text-3xl font-black tracking-tighter">FoodGenie</span>
-                   </div>
+                    <Link to="/" className="inline-block mb-10 hover:opacity-90 transition-opacity">
+                       <Logo />
+                    </Link>
                    <p className="text-white/30 max-w-sm text-lg italic mb-10 leading-relaxed font-medium border-l-2 border-white/5 pl-8">
                      "Redefining modern dining through intelligent suggestions and seamless logistics."
                    </p>
@@ -451,7 +454,8 @@ const Home = () => {
         </footer>
       </div>
       )}
-    </motion.div>
+      </motion.div>
+    </>
   )
 }
 

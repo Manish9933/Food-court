@@ -16,6 +16,19 @@ const AnimatedBackground = () => {
     return () => clearInterval(timer)
   }, [])
 
+  // Simplified Logo Icon for parcels
+  const MiniLogo = ({ x, y, opacity = 0.4, scale = 0.4 }) => (
+    <g transform={`translate(${x}, ${y}) scale(${scale})`} opacity={opacity}>
+      <ellipse cx="50" cy="85" rx="38" ry="10" fill="white" />
+      <path d="M22 78V58" stroke="white" strokeWidth="6" strokeLinecap="round" />
+      <ellipse cx="22" cy="46" rx="7" ry="11" fill="white" />
+      <path d="M78 78V58" stroke="white" strokeWidth="6" strokeLinecap="round" />
+      <ellipse cx="78" cy="46" rx="7" ry="11" fill="white" />
+      <path d="M32 55C32 55 32 82 50 82C68 82 68 55 68 55H32Z" fill="white" />
+      <path d="M68 62C78 62 78 75 68 75" stroke="white" strokeWidth="6" strokeLinecap="round" fill="none" />
+    </g>
+  );
+
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#0a0b12] select-none">
       {/* 🏙️ THE FINAL PREMIUM ILLUSTRATION BACKGROUND */}
@@ -68,12 +81,15 @@ const AnimatedBackground = () => {
                <rect x="68" y="75" width="12" height="45" rx="6" fill="#fff" />
                <AnimatePresence>
                  {stage === 'handoff' && (
-                   <motion.rect 
+                   <motion.g
                      initial={{ scale: 0, opacity: 0, y: -20 }}
                      animate={{ scale: 1, opacity: 1, y: 0 }}
                      exit={{ opacity: 0, x: 20 }}
-                     x="80" y="95" width="30" height="25" rx="4" fill="#cd853f" 
-                   />
+                   >
+                     <rect x="80" y="95" width="35" height="30" rx="4" fill="#cd853f" />
+                     <MiniLogo x={89} y={97} opacity={0.3} scale={0.18} />
+                     <text x="83" y="120" fill="white" fillOpacity="0.4" fontSize="5" fontWeight="900" style={{ letterSpacing: '0px' }}>FoodGenie</text>
+                   </motion.g>
                  )}
                </AnimatePresence>
             </motion.g>
@@ -111,15 +127,20 @@ const AnimatedBackground = () => {
                </g>
                <AnimatePresence>
                  {stage === 'driving-out' && (
-                   <motion.rect 
+                   <motion.g
                      initial={{ x: -15, opacity: 0 }}
                      animate={{ x: 0, opacity: 1 }}
-                     x="80" y="25" width="35" height="30" rx="5" fill="#cd853f" 
-                   />
+                   >
+                     <rect x="80" y="25" width="35" height="30" rx="5" fill="#cd853f" />
+                     <MiniLogo x={89} y={27} opacity={0.3} scale={0.18} />
+                     <text x="83" y="50" fill="white" fillOpacity="0.4" fontSize="5" fontWeight="900">FoodGenie</text>
+                   </motion.g>
                  )}
                </AnimatePresence>
                <rect x="25" y="30" width="38" height="38" rx="6" fill="#f59e0b" />
-               <text x="37" y="58" fill="#fff" fontSize="24" fontWeight="1000">G</text>
+               <MiniLogo x={32} y={35} opacity={0.6} scale={0.25} />
+               <text x="27.5" y="60" fill="#fff" fontSize="6" fontWeight="1000" letterSpacing="-0.3">FoodGenie</text>
+               <rect x="28" y="63" width="32" height="1" fill="#fff" fillOpacity="0.3" />
             </svg>
             {stage !== 'handoff' && [...Array(3)].map((_, i) => (
               <motion.div

@@ -252,7 +252,7 @@ const ManageMenu = () => {
             setFormData({ name: '', price: '', category: 'Burgers', description: '', image: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&q=80&w=200', isPlateComponent: false, plateCategory: 'none' });
             setShowModal(true);
           }}
-          className="px-6 py-3.5 bg-orange-500 hover:bg-orange-600 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-orange-500/20 active:scale-95 text-black"
+          className="px-6 py-3.5 bg-primary-500 hover:bg-primary-600 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-primary-500/20 active:scale-95 text-black"
         >
           <Plus size={16} />
           <span>Add New Dish</span>
@@ -261,11 +261,11 @@ const ManageMenu = () => {
 
       <div className="flex gap-4 mb-8">
         <div className="flex-1 relative group">
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-hover:text-orange-500 transition-colors" />
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-hover:text-primary-500 transition-colors" />
           <input 
             type="text" 
             placeholder="Search menu items..." 
-            className="w-full bg-[#111114] border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:border-orange-500/50 transition-all text-white"
+            className="w-full bg-[#111114] border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:border-primary-500/50 transition-all text-white"
           />
         </div>
       </div>
@@ -306,7 +306,7 @@ const ManageMenu = () => {
                     {item.image ? (
                        <img src={item.image} alt={item.name} className="w-12 h-12 rounded-xl object-cover border border-white/5" />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center font-black text-orange-500">
+                      <div className="w-12 h-12 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center font-black text-primary-500">
                         {item.name.charAt(0)}
                       </div>
                     )}
@@ -327,7 +327,7 @@ const ManageMenu = () => {
                   </button>
                 </td>
                 <td className="px-8 py-6 text-right space-x-2">
-                  <button onClick={() => handleEdit(item)} className="p-2 hover:bg-orange-500/10 hover:text-orange-500 rounded-lg transition-colors text-zinc-500">
+                  <button onClick={() => handleEdit(item)} className="p-2 hover:bg-primary-500/10 hover:text-primary-500 rounded-lg transition-colors text-zinc-500">
                     <Edit2 size={16} />
                   </button>
                   <button onClick={() => window.confirm('Delete this dish?') && deleteFood(item._id)} className="p-2 hover:bg-rose-500/10 hover:text-rose-500 rounded-lg transition-colors text-zinc-500">
@@ -397,7 +397,7 @@ const ManageMenu = () => {
                       <select 
                         value={formData.category}
                         onChange={(e) => setFormData({...formData, category: e.target.value})}
-                        className="flex-1 bg-white/5 border border-white/5 rounded-2xl py-3.5 px-6 text-sm font-medium focus:outline-none focus:border-orange-500/50 transition-all text-white appearance-none"
+                        className="flex-1 bg-white/5 border border-white/5 rounded-2xl py-3.5 px-6 text-sm font-medium focus:outline-none focus:border-primary-500/50 transition-all text-white appearance-none"
                       >
                         <option value="" disabled className="bg-[#111114]">Select Category</option>
                         {categories.map((cat) => (
@@ -479,13 +479,13 @@ const ManageMenu = () => {
                             value={formData.image}
                             onChange={(e) => setFormData({...formData, image: e.target.value})}
                             placeholder="Paste image URL here..." 
-                            className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-6 text-sm font-medium focus:outline-none focus:border-orange-500/50 transition-all text-white"
+                            className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-6 text-sm font-medium focus:outline-none focus:border-primary-500/50 transition-all text-white"
                           />
                           <button 
                             type="button"
                             onClick={handleAISuggest}
                             disabled={isSuggesting}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-orange-500 hover:bg-orange-600 text-black rounded-xl transition-all shadow-lg active:scale-90 disabled:opacity-50"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary-500 hover:bg-primary-600 text-black rounded-xl transition-all shadow-lg active:scale-90 disabled:opacity-50"
                           >
                              {isSuggesting ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                           </button>
@@ -522,7 +522,7 @@ const ManageMenu = () => {
                       value={formData.description}
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
                       placeholder="Tell more about this dish..." 
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-6 text-sm font-medium focus:outline-none focus:border-orange-500/50 transition-all text-white h-24 resize-none"
+                      className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 px-6 text-sm font-medium focus:outline-none focus:border-primary-500/50 transition-all text-white h-24 resize-none"
                     />
                   </div>
 
@@ -537,7 +537,7 @@ const ManageMenu = () => {
                     <button 
                       disabled={isLoading}
                       type="submit" 
-                      className="flex-2 px-12 py-4 bg-orange-500 hover:bg-orange-600 rounded-2xl font-bold transition-all shadow-xl shadow-orange-500/20 text-black active:scale-95 disabled:opacity-50"
+                      className="flex-2 px-12 py-4 bg-primary-500 hover:bg-primary-600 rounded-2xl font-bold transition-all shadow-xl shadow-primary-500/20 text-black active:scale-95 disabled:opacity-50"
                     >
                       {editingId ? 'Update Dish' : 'Save Dish'}
                     </button>
@@ -566,7 +566,7 @@ const ManageMenu = () => {
               <div className="p-10">
                  <div className="flex items-center justify-between mb-8">
                     <div>
-                       <h3 className="text-2xl font-black tracking-tight text-white uppercase italic">AI <span className="text-orange-500">Vision Picker</span></h3>
+                       <h3 className="text-2xl font-black tracking-tight text-white uppercase italic">AI <span className="text-primary-500">Vision Picker</span></h3>
                        <p className="text-zinc-500 text-sm font-medium">Select the best match for "{formData.name}"</p>
                     </div>
                     <button onClick={() => setShowPicker(false)} className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all text-white/40 hover:text-white">
@@ -579,7 +579,7 @@ const ManageMenu = () => {
                        <motion.div 
                         key={idx}
                         whileHover={{ scale: 1.02, translateY: -5 }}
-                        className="relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-orange-500 group shadow-2xl"
+                        className="relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-primary-500 group shadow-2xl"
                         onClick={() => {
                           setFormData({ ...formData, image: url });
                           setShowPicker(false);
@@ -587,14 +587,14 @@ const ManageMenu = () => {
                        >
                           <img src={url} alt={`Option ${idx+1}`} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Option {idx+1}</p>
+                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-500">Option {idx+1}</p>
                              <p className="text-white font-bold text-xs">Tap to Select</p>
                           </div>
                           
                           {/* Selected Overlay if it matches current */}
                           {formData.image === url && (
-                            <div className="absolute inset-0 bg-orange-500/20 flex items-center justify-center backdrop-blur-sm">
-                               <div className="bg-orange-500 text-black p-2 rounded-full shadow-2xl"><Sparkles size={16} /></div>
+                            <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center backdrop-blur-sm">
+                               <div className="bg-primary-500 text-black p-2 rounded-full shadow-2xl"><Sparkles size={16} /></div>
                             </div>
                           )}
                        </motion.div>
@@ -608,7 +608,7 @@ const ManageMenu = () => {
                       onClick={handleAISuggest}
                       className="px-8 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-3 disabled:opacity-50"
                     >
-                       {isSuggesting ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-orange-500" />}
+                       {isSuggesting ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-primary-500" />}
                        {isSuggesting ? 'Analyzing Vision...' : 'Regenerate Samples'}
                     </button>
                  </div>

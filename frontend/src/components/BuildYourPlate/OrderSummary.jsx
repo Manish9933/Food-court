@@ -1,6 +1,7 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Minus, Plus, Trash2, ShoppingCart, RotateCcw, Star, Flame } from 'lucide-react'
+import LogoIcon from '../LogoIcon'
 import useCartStore from '../../store/useCartStore'
 import { useNavigate } from 'react-router-dom'
 
@@ -74,9 +75,9 @@ const OrderSummary = ({ plateItems, onRemoveItem, onClearPlate, onAddCombo }) =>
           <motion.div
             animate={{ rotate: [0, -5, 5, 0] }}
             transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-            className="text-5xl mb-4"
+            className="mb-4"
           >
-            🍽️
+            <LogoIcon size={64} />
           </motion.div>
           <p className="text-[13px] font-black text-white/30">Your plate is empty</p>
           <p className="text-[11px] text-white/15 mt-1">Add items from the left sidebar</p>
@@ -249,9 +250,9 @@ const OrderSummary = ({ plateItems, onRemoveItem, onClearPlate, onAddCombo }) =>
             </p>
             <div className="space-y-1.5">
               {[
-                { name: 'Classic Thali', emoji: '🍽️' },
-                { name: 'Paneer Feast',  emoji: '🧆' },
-                { name: 'Biryani Combo', emoji: '🫕' },
+                { name: 'Classic Thali', icon: <LogoIcon size={20} /> },
+                { name: 'Paneer Feast',  icon: <LogoIcon size={20} /> },
+                { name: 'Biryani Combo', icon: <LogoIcon size={20} /> },
               ].map((combo) => (
                 <button
                   key={combo.name}
@@ -262,7 +263,7 @@ const OrderSummary = ({ plateItems, onRemoveItem, onClearPlate, onAddCombo }) =>
                              text-white/30 hover:text-white/70
                              flex items-center gap-2.5 text-[11px] font-black transition-all"
                 >
-                  <span className="text-base">{combo.emoji}</span>
+                  <span className="text-base">{combo.icon || combo.emoji}</span>
                   {combo.name}
                 </button>
               ))}

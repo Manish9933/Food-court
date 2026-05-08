@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Plus, Minus, Trash2 } from 'lucide-react'
+import LogoIcon from '../LogoIcon'
 
 
 /* ─────────────────────────────────────────────
@@ -267,9 +268,9 @@ const PlateCanvas = ({ plateItems, onRemoveOneById, onAddOneById, onClearTypeByI
         <p className="text-[10px] font-black uppercase tracking-[0.35em] text-white/20 mb-1">
           Your Plate
         </p>
-        <h2 className="text-xl font-black text-white/80">
+        <h2 className="text-xl font-black text-white/80 flex items-center justify-center gap-2">
           {plateItems.length === 0
-            ? 'Start Building 🍽️'
+            ? <>Start Building <LogoIcon size={24} /></>
             : `${plateItems.length} Item${plateItems.length > 1 ? 's' : ''} Added`
           }
         </h2>
@@ -311,9 +312,9 @@ const PlateCanvas = ({ plateItems, onRemoveOneById, onAddOneById, onClearTypeByI
                   <motion.div
                     animate={{ y: [0, -7, 0] }}
                     transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                    className="text-5xl mb-3"
+                    className="mb-3"
                   >
-                    🍽️
+                    <LogoIcon size={80} />
                   </motion.div>
                   <p className="text-[11px] font-black text-white/20 uppercase tracking-widest">
                     Tap items to add

@@ -35,14 +35,14 @@ const AdminTopbar = ({ sidebarOpen }) => {
     >
       <div className="flex-1 max-w-xl group relative">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-2">
-          <Search size={20} className="text-zinc-600 transition-colors group-hover:text-orange-500" />
+          <Search size={20} className="text-zinc-600 transition-colors group-hover:text-primary-500" />
         </div>
         <input
           type="text"
           placeholder="Search products, orders, customers..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-[#111114] border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500/50 transition-all ring-0 focus:ring-4 focus:ring-orange-500/5"
+          className="w-full bg-[#111114] border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium text-white placeholder-zinc-500 focus:outline-none focus:border-primary-500/50 transition-all ring-0 focus:ring-4 focus:ring-primary-500/5"
         />
       </div>
 
@@ -54,7 +54,7 @@ const AdminTopbar = ({ sidebarOpen }) => {
           >
             <Bell size={20} />
             {unreadCount > 0 && (
-              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-orange-500 border-2 border-[#111114] rounded-full" />
+              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-primary-500 border-2 border-[#111114] rounded-full" />
             )}
           </button>
 
@@ -70,7 +70,7 @@ const AdminTopbar = ({ sidebarOpen }) => {
                   <h3 className="font-bold text-lg">Notifications</h3>
                   <button 
                     onClick={clearAllNotifications}
-                    className="text-xs font-bold text-orange-500 hover:text-orange-400 transition-colors uppercase tracking-widest">
+                    className="text-xs font-bold text-primary-500 hover:text-primary-400 transition-colors uppercase tracking-widest">
                     Mark All Read
                   </button>
                 </div>
@@ -82,7 +82,7 @@ const AdminTopbar = ({ sidebarOpen }) => {
                   ) : notifications.map((notif) => {
                     let Icon = Bell;
                     let color = "text-blue-400";
-                    if (notif.type === 'system') { Icon = AlertCircle; color = "text-orange-400"; }
+                    if (notif.type === 'system') { Icon = AlertCircle; color = "text-primary-400"; }
                     if (notif.type === 'review') { Icon = MessageCircle; color = "text-green-400"; }
 
                     return (
@@ -91,7 +91,7 @@ const AdminTopbar = ({ sidebarOpen }) => {
                         onClick={() => markAsRead(notif._id)}
                         className={`flex gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group relative ${!notif.isRead ? 'bg-white/[0.02]' : 'opacity-60'}`}
                       >
-                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-orange-500/20 transition-all">
+                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-primary-500/20 transition-all">
                           <Icon size={18} className={color} />
                         </div>
                         <div>
@@ -101,7 +101,7 @@ const AdminTopbar = ({ sidebarOpen }) => {
                           </span>
                         </div>
                         {!notif.isRead && (
-                          <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-orange-500 rounded-full" />
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary-500 rounded-full" />
                         )}
                       </div>
                     );
@@ -140,7 +140,7 @@ const AdminTopbar = ({ sidebarOpen }) => {
                 className="absolute top-20 right-0 w-64 bg-[#0a0a0b]/98 backdrop-blur-3xl p-2 rounded-3xl border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.8)] z-[1000] overflow-hidden"
               >
                 <div className="px-6 py-6 border-b border-white/5 mb-3 bg-white/[0.01]">
-                   <p className="text-[10px] text-orange-500 uppercase tracking-[0.25em] font-black mb-1.5 opacity-80">System Operator</p>
+                   <p className="text-[10px] text-primary-500 uppercase tracking-[0.25em] font-black mb-1.5 opacity-80">System Operator</p>
                    <p className="text-sm font-black truncate tracking-tight text-white">{user?.name || 'Admin Account'}</p>
                 </div>
                 

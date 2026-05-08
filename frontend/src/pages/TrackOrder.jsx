@@ -252,10 +252,10 @@ const TrackOrder = () => {
                       className="relative w-24 h-24 rounded-[2.5rem] overflow-hidden border-2 border-emerald-500/30 shadow-[0_0_40px_rgba(16,185,129,0.25)] bg-[#121214]"
                     >
                        <img 
-                        src="/assets/courier.png" 
-                        onError={(e) => { e.target.src = "https://i.ibb.co/L9Y0Rzj/blinkit-rider.png" }}
+                        src="https://images.unsplash.com/photo-1617347454431-f49d7ff5c3b1?q=80&w=256&auto=format&fit=crop" 
+                        onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Courier&background=10b981&color=fff" }}
                         className="w-full h-full object-cover brightness-105" 
-                        alt="Friendly Courier" 
+                        alt="Delivery Partner" 
                        />
                        {/* Subtle Green Scanline */}
                        <motion.div 

@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Mail, Lock, User, ArrowRight, ChefHat } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import useAuthStore from '../store/useAuthStore'
 import AnimatedBackground from '../components/AnimatedBackground'
+import Logo from '../components/Logo'
 
 const Signup = () => {
   const [email, setEmail] = useState('')
@@ -41,19 +42,8 @@ const Signup = () => {
           <div className="p-8 sm:p-10">
 
             {/* Header */}
-            <div className="text-center mb-7">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 220, damping: 18 }}
-                className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl mb-4 shadow-lg shadow-primary-500/20"
-              >
-                <ChefHat className="w-7 h-7 text-white" />
-              </motion.div>
-
-              <h1 className="text-2xl font-black text-white tracking-tight">
-                Food<span className="text-primary-500 text-glow">Genie</span>
-              </h1>
+            <div className="flex flex-col items-center mb-8">
+              <Logo className="scale-125 mb-4" />
               <h2 className="text-2xl font-black text-white mt-1 mb-1.5 tracking-tight">Create Account</h2>
               <p className="text-white/35 text-sm font-medium">Join FoodGenie for personalized dining.</p>
             </div>

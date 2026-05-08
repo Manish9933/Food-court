@@ -20,6 +20,7 @@ import {
 
 import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import LogoIcon from "../../components/LogoIcon";
 
 const AdminSidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
@@ -52,17 +53,19 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
     >
       <div className="p-6 flex items-center justify-between pb-10">
         <div className={`flex items-center gap-3 overflow-hidden ${!isOpen && "hidden"}`}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-400 to-rose-500 shadow-xl flex items-center justify-center">
-            <span className="text-xl font-black italic tracking-tighter">FG</span>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-primary-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <LogoIcon size={40} className="relative z-10" />
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-tight">FoodGenie</h1>
-            <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-[2px]">Admin Panel</p>
+            <h1 className="text-lg font-bold tracking-tight text-white/90">FoodGenie</h1>
+            <p className="text-[9px] text-primary-500/60 font-black uppercase tracking-[2px]">Admin Portal</p>
           </div>
         </div>
         {!isOpen && (
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-400 to-rose-500 shadow-xl flex items-center justify-center">
-            <span className="text-xl font-black italic tracking-tighter">FG</span>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-primary-500/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <LogoIcon size={36} className="relative z-10" />
           </div>
         )}
         <button
@@ -81,19 +84,18 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
               key={link.path}
               to={link.path}
               className={`flex items-center gap-4 px-4 py-3.5 rounded-xl group transition-all duration-300 relative ${
-                isActive
-                  ? "bg-gradient-to-r from-orange-500/10 to-transparent text-orange-500"
+                  ? "bg-gradient-to-r from-primary-500/10 to-transparent text-primary-500"
                   : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active"
-                  className="absolute left-0 w-1 h-8 bg-orange-500 rounded-full"
+                  className="absolute left-0 w-1 h-8 bg-primary-500 rounded-full"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
-              <div className={`transition-colors duration-300 ${isActive ? "text-orange-500" : "group-hover:text-zinc-200"}`}>
+              <div className={`transition-colors duration-300 ${isActive ? "text-primary-500" : "group-hover:text-zinc-200"}`}>
                 {link.icon}
               </div>
               <span className={`font-semibold tracking-tight whitespace-nowrap transition-all duration-300 ${!isOpen && "opacity-0 invisible w-0"}`}>
