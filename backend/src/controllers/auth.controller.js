@@ -32,6 +32,12 @@ exports.registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
+        tasteMood: user.tasteMood,
+        rank: user.rank,
+        xp: user.xp,
+        ordersCompleted: user.ordersCompleted,
+        favoritesCount: user.favoritesCount,
         token: generateToken(user._id),
       });
     }
@@ -54,6 +60,12 @@ exports.loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
+        tasteMood: user.tasteMood,
+        rank: user.rank,
+        xp: user.xp,
+        ordersCompleted: user.ordersCompleted,
+        favoritesCount: user.favoritesCount,
         token: generateToken(user._id),
       });
     } else {
@@ -76,6 +88,12 @@ exports.getUserProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
+        tasteMood: user.tasteMood,
+        rank: user.rank,
+        xp: user.xp,
+        ordersCompleted: user.ordersCompleted,
+        favoritesCount: user.favoritesCount,
       });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -93,6 +111,13 @@ exports.updateUserProfile = async (req, res) => {
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
+      user.avatar = req.body.avatar !== undefined ? req.body.avatar : user.avatar;
+      user.tasteMood = req.body.tasteMood || user.tasteMood;
+      user.rank = req.body.rank || user.rank;
+      user.xp = req.body.xp !== undefined ? req.body.xp : user.xp;
+      user.ordersCompleted = req.body.ordersCompleted !== undefined ? req.body.ordersCompleted : user.ordersCompleted;
+      user.favoritesCount = req.body.favoritesCount !== undefined ? req.body.favoritesCount : user.favoritesCount;
+
       if (req.body.password) {
         user.password = req.body.password;
       }
@@ -104,6 +129,12 @@ exports.updateUserProfile = async (req, res) => {
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
+        avatar: updatedUser.avatar,
+        tasteMood: updatedUser.tasteMood,
+        rank: updatedUser.rank,
+        xp: updatedUser.xp,
+        ordersCompleted: updatedUser.ordersCompleted,
+        favoritesCount: updatedUser.favoritesCount,
         token: generateToken(updatedUser._id),
       });
     } else {

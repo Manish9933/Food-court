@@ -7,3 +7,5 @@ build
 *.log
 backend/.env
 frontend/.env
+
+.vercel

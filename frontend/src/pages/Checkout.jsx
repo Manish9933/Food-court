@@ -10,6 +10,16 @@ import useCartStore from '../store/useCartStore'
 import useAuthStore from '../store/useAuthStore'
 import api from '../api/api'
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const Checkout = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -53,9 +63,76 @@ const Checkout = () => {
         return;
       }
 
+      // 💳 Razorpay Integration (Test Mode)
+      if (paymentMethod !== 'cash') {
+        const res = await loadRazorpayScript();
+        if (!res) {
+          alert('Razorpay SDK failed to load. Are you online?');
+          setIsProcessing(false);
+          return;
+        }
+
+        // Create Order on Backend
+        const { data: order } = await api.post('/payments/orders', { amount: total });
+
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_placeholder', // Replace with your Key ID
+          amount: order.amount,
+          currency: order.currency,
+          name: "FoodGenie AI",
+          description: "Gourmet Gastronomy Payment",
+          image: "https://i.ibb.co/3W6qWqX/logo.png", // Replace with your logo
+          order_id: order.id,
+          handler: async function (response) {
+            try {
+              // Verify Payment on Backend
+              const verifyRes = await api.post('/payments/verify', response);
+              if (verifyRes.data.message === "Payment verified successfully") {
+                finalizeOrder('Paid');
+              }
+            } catch (err) {
+              alert("Payment verification failed!");
+              setIsProcessing(false);
+            }
+          },
+          prefill: {
+            name: user.name,
+            email: user.email,
+            contact: address.phone
+          },
+          theme: {
+            color: "#6366f1",
+          },
+          modal: {
+            ondismiss: function() {
+              setIsProcessing(false);
+            }
+          }
+        };
+
+        const rzp1 = new window.Razorpay(options);
+        rzp1.open();
+      } else {
+        // Cash on Delivery
+        finalizeOrder('Pending');
+      }
+    } catch (error) {
+      console.error('Order placement failed:', error)
+      alert(error.response?.data?.message || 'Order failed to reach the kitchen. Please check your connection.')
+      setIsProcessing(false)
+    }
+  }
+
+  const finalizeOrder = async (paymentStatus) => {
+    try {
+      const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+      const validItems = cartItems.filter(item => 
+        item._id && objectIdRegex.test(item._id)
+      );
+
       const orderData = {
         items: validItems.map(item => ({
-          foodItem: item._id, // Must be a valid MongoDB ObjectId
+          foodItem: item._id, 
           name: item.name,
           quantity: item.quantity,
           price: item.price
@@ -63,19 +140,18 @@ const Checkout = () => {
         totalAmount: total,
         shippingAddress: address,
         paymentMethod: paymentMethod,
-        paymentStatus: 'Paid',
+        paymentStatus: paymentStatus,
         status: 'Pending'
       }
 
       await api.post('/orders', orderData)
-
       setIsProcessing(false)
       setIsSuccess(true)
       clearCart()
-    } catch (error) {
-      console.error('Order placement failed:', error)
-      alert(error.response?.data?.message || 'Order failed to reach the kitchen. Please check your connection.')
-      setIsProcessing(false)
+    } catch (err) {
+      console.error('Finalization failed:', err);
+      alert('Order finalization failed. Please contact support.');
+      setIsProcessing(false);
     }
   }
 
@@ -237,21 +313,21 @@ const Checkout = () => {
                   {cartItems.map((item, idx) => (
                     <div key={idx} className="flex justify-between items-center text-sm">
                       <p className="text-white/60 font-bold max-w-[180px] line-clamp-1">{item.quantity}x {item.name}</p>
-                      <p className="font-black text-white/80">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-black text-white/80">₹{(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   ))}
                   <div className="h-[1px] bg-white/5" />
                   <div className="flex justify-between items-center">
                     <span className="text-white/30 text-[10px] font-black uppercase tracking-widest">Subtotal</span>
-                    <span className="text-white/80 font-black">${subtotal.toFixed(2)}</span>
+                    <span className="text-white/80 font-black">₹{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-white/30 text-[10px] font-black uppercase tracking-widest">Taxes</span>
-                    <span className="text-white/80 font-black">${tax.toFixed(2)}</span>
+                    <span className="text-white/80 font-black">₹{tax.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-white/10">
                     <span className="text-primary-500 text-xs font-black uppercase tracking-widest">Final Bill</span>
-                    <span className="text-4xl font-black gradient-text">${total.toFixed(2)}</span>
+                    <span className="text-4xl font-black gradient-text">₹{total.toFixed(2)}</span>
                   </div>
                </div>
 
@@ -281,9 +357,14 @@ const Checkout = () => {
                  )}
                </button>
 
-               <div className="mt-8 flex justify-center items-center gap-2 opacity-20">
-                  <ShieldCheck size={14} />
-                  <span className="text-[8px] font-black uppercase tracking-[0.3em]">PCI-DSS Compliant Infrastructure</span>
+               <div className="mt-8 flex flex-col items-center gap-2">
+                  <div className="flex items-center justify-center gap-2 opacity-20">
+                    <ShieldCheck size={14} />
+                    <span className="text-[8px] font-black uppercase tracking-[0.3em]">PCI-DSS Compliant Infrastructure</span>
+                  </div>
+                  <div className="mt-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-500">Test Mode OTP: 123456</p>
+                  </div>
                </div>
             </motion.div>
 

@@ -32,9 +32,29 @@ import Settings from './admin/pages/Settings'
 import OrderDetails from './admin/pages/OrderDetails'
 import ManageDeliveryBoys from './admin/pages/ManageDeliveryBoys'
 
+import useAuthStore from './store/useAuthStore'
+import { useTheme } from './context/ThemeContext'
+
 const AppContent = () => {
   const location = useLocation()
+  const { user } = useAuthStore()
+  const { applyTheme } = useTheme()
   const isAdminPath = location.pathname.startsWith('/admin')
+
+  // Sync theme with user taste mood
+  React.useEffect(() => {
+    if (user?.tasteMood) {
+      const themeMap = {
+        adventurous: 'purple',
+        comfort: 'orange',
+        healthy: 'green',
+        energetic: 'blue'
+      }
+      if (themeMap[user.tasteMood]) {
+        applyTheme(themeMap[user.tasteMood])
+      }
+    }
+  }, [user?.tasteMood])
 
   return (
     <div className={`min-h-screen bg-dark-900 font-outfit text-white selection:bg-primary-500/30 overflow-x-hidden ${!isAdminPath ? 'pt-[110px]' : ''}`}>

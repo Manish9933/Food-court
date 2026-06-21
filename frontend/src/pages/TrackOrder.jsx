@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ArrowLeft, Package, Truck, UtensilsCrossed, 
   CheckCircle2, Clock, MapPin, Phone, MessageSquare,
-  Navigation, Share2, Sparkles, ChefHat, Loader2, Star
+  Navigation, Share2, Sparkles, ChefHat, Loader2, Star, ArrowRight
 } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/api'
 import { TrackOrderSkeleton } from '../components/Skeleton'
+import Logo from '../components/Logo'
 
 const TrackOrder = () => {
   const { id } = useParams()
@@ -21,19 +22,48 @@ const TrackOrder = () => {
   const [deliveryRating, setDeliveryRating] = useState(0)
   const [feedback, setFeedback] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [prevStatus, setPrevStatus] = useState(null)
+  
+  // Telemetry simulation states
+  const [telemetry, setTelemetry] = useState({
+    lat: 51.5074,
+    lng: -0.1278,
+    velocity: 0,
+    eta: 18
+  })
+
+  const updateTelemetry = (step) => {
+    if (step === 2) { // Out for Delivery
+      setTelemetry(prev => ({
+        lat: prev.lat + (Math.random() - 0.5) * 0.001,
+        lng: prev.lng + (Math.random() - 0.5) * 0.001,
+        velocity: 20 + Math.floor(Math.random() * 15),
+        eta: Math.max(2, prev.eta - (Math.random() > 0.7 ? 1 : 0))
+      }))
+    } else if (step === 3) { // Delivered
+      setTelemetry(prev => ({ ...prev, velocity: 0, eta: 0 }))
+    } else {
+      setTelemetry(prev => ({ ...prev, velocity: 0, eta: step === 0 ? 25 : 18 }))
+    }
+  }
 
   const fetchOrderData = async () => {
     try {
+      let currentOrder;
       if (id) {
-        // Fetch specific order
         const { data } = await api.get(`/orders/${id}`)
-        setOrder(data)
+        currentOrder = data
       } else {
-        // Fetch latest order
         const { data } = await api.get('/orders/myorders')
-        if (data && data.length > 0) {
-          setOrder(data[0])
+        if (data && data.length > 0) currentOrder = data[0]
+      }
+
+      if (currentOrder) {
+        if (prevStatus && prevStatus !== currentOrder.status) {
+          showNotification(`Mission Update: Status changed to ${currentOrder.status}`)
         }
+        setOrder(currentOrder)
+        setPrevStatus(currentOrder.status)
       }
     } catch (error) {
       console.error('Failed to fetch order tracking info:', error)
@@ -44,9 +74,20 @@ const TrackOrder = () => {
 
   useEffect(() => {
     fetchOrderData()
-    const interval = setInterval(fetchOrderData, 10000) // Poll every 10s
+    const interval = setInterval(() => {
+      fetchOrderData()
+    }, 10000) 
     return () => clearInterval(interval)
   }, [id])
+
+  useEffect(() => {
+    if (order) {
+      const step = getActiveStep(order.status)
+      updateTelemetry(step)
+      const telemetryInterval = setInterval(() => updateTelemetry(step), 3000)
+      return () => clearInterval(telemetryInterval)
+    }
+  }, [order?.status])
 
   const getActiveStep = (status) => {
     switch (status) {
@@ -65,23 +106,78 @@ const TrackOrder = () => {
     setTimeout(() => setNotification(null), 3000)
   }
 
-  const handleShare = () => {
-    showNotification("Secure tracking link copied to clipboard!")
+  const handleShare = async () => {
+    const itemList = order?.items?.map(i => i.name).join(', ')
+    const shareData = {
+      title: `Gastronomic Mission Update 🛸`,
+      text: `My ₹${order?.totalAmount?.toFixed(2)} feast is in transit! 🍱 Currently tracking: ${itemList}. Phase: ${order?.status}. Follow the neural link for live telemetry:`,
+      url: window.location.href
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+        showNotification("Sharing Mission Intelligence...")
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`)
+        showNotification("Share link copied to clipboard!")
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        navigator.clipboard.writeText(shareData.url)
+        showNotification("Link copied to clipboard!")
+      }
+    }
   }
 
   const handleAIPredict = () => {
-    showNotification("AI Analysis: Rapid dispatch confirmed. Expected arrival 15-20m.")
+    const courier = order?.deliveryBoy?.name?.split(' ')[0] || "Agent"
+    const status = order?.status
+    const messages = {
+      'Pending': [
+        "AI Analysis: Mission initiated. Validating gastronomic blueprints.",
+        "Predictive Sync: Order queued for priority kitchen dispatch.",
+        "Neural Pulse: Verifying item availability in local nodes."
+      ],
+      'Preparing': [
+        "AI Insight: Chef Hat protocol active. Optimizing flavor profiles.",
+        "Thermal Check: Oven temp calibrated. Preparation at 45% efficiency.",
+        "Quantum Kitchen: Your feast is being assembled with surgical precision."
+      ],
+      'Out for Delivery': [
+        `Neural Sync: ${courier} is tracking at ${telemetry.velocity} km/h. Route optimal.`,
+        `AI Trajectory: Intercept expected in ${telemetry.eta} minutes.`,
+        "Velocity Lock: Courier has reached terminal speed. Safety buffers enabled."
+      ],
+      'Delivered': [
+        "Mission Debrief: Feast delivered with 100% precision. Enjoy.",
+        "Neural Archive: Flavor sync complete. Loyalty tokens unlocked.",
+        "AI Report: Final hand-off successful. Mission complete."
+      ]
+    }
+
+    const currentMessages = messages[status] || messages['Pending']
+    const randomMsg = currentMessages[Math.floor(Math.random() * currentMessages.length)]
+    showNotification(randomMsg)
   }
 
   const handleContact = (type) => {
     const courierName = order?.deliveryBoy?.name || "Courier"
     const courierPhone = order?.deliveryBoy?.phone || "+1 (555) 012-3456"
-    showNotification(type === 'phone' ? `Dialing ${courierName}: ${courierPhone}` : `Opening Encrypted Chat with ${courierName}`)
+    
+    if (type === 'phone') {
+      showNotification(`Initiating Secure Link with ${courierName}...`)
+      window.open(`tel:${courierPhone}`)
+    } else {
+      showNotification(`Opening Encrypted Chat with ${courierName}`)
+    }
   }
 
   const handleCopyId = () => {
-    navigator.clipboard.writeText(order?._id)
-    showNotification("Precise Node ID copied to neural link!")
+    const idToCopy = order?.customId || order?._id
+    navigator.clipboard.writeText(idToCopy)
+    showNotification("Precise Mission ID copied to neural link!")
   }
 
   const handleSubmitReview = async () => {
@@ -147,24 +243,25 @@ const TrackOrder = () => {
         {/* Header - Mission Status */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10 mb-16">
           <div className="flex items-center gap-8">
-            <button onClick={() => navigate('/')} className="bg-white/5 p-5 rounded-[2rem] border border-white/5 hover:bg-white/10 transition-all text-white/40 hover:text-white shadow-2xl group">
+            <button onClick={() => navigate(-1)} className="bg-white/5 p-5 rounded-[2rem] border border-white/5 hover:bg-white/10 transition-all text-white/40 hover:text-white shadow-2xl group">
               <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
             </button>
             <div>
+               <Logo className="mb-2 -ml-2 scale-90 origin-left" />
                <div className="flex items-center gap-3 mb-2">
                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] heading-premium tracking-[-0.04em] leading-none mb-4">
                     MISSION<span className="primary-gradient-text px-2">TRACKER</span>
                  </h1>
                </div>
-               <div className="flex items-center gap-4 text-white/30 text-[10px] font-black uppercase tracking-[0.3em]">
-                 <span onClick={handleCopyId} className="text-primary-500/80 cursor-pointer hover:text-primary-400 transition-colors flex items-center gap-2">
-                   ID #GENIE-{order?._id?.slice(-6).toUpperCase()}
-                   <span className="bg-white/5 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"><ArrowLeft size={8} className="rotate-180" /></span>
-                 </span>
-                 <div className="w-1 h-1 bg-white/10 rounded-full" />
-                 <span className="flex items-center gap-2"><Clock size={12} /> EST ARRIVAL: {activeStep < 3 ? '18 MIN' : 'ARRIVED'}</span>
-               </div>
+                <div className="flex items-center gap-4 text-white/30 text-[10px] font-black uppercase tracking-[0.3em]">
+                  <div onClick={handleCopyId} className="group/id text-primary-500/80 cursor-pointer hover:text-primary-400 transition-colors flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 hover:border-primary-500/30">
+                    ID #{order?.customId || `GENIE-${order?._id?.slice(-6).toUpperCase()}`}
+                    <ArrowRight size={10} className="opacity-0 group-hover/id:opacity-100 transition-all group-hover/id:translate-x-1" />
+                  </div>
+                  <div className="w-1 h-1 bg-white/10 rounded-full" />
+                  <span className="flex items-center gap-2"><Clock size={12} /> EST ARRIVAL: {activeStep < 3 ? `${telemetry.eta} MIN` : 'ARRIVED'}</span>
+                </div>
             </div>
           </div>
 
@@ -418,15 +515,15 @@ const TrackOrder = () => {
                         <div className="flex gap-8">
                            <div>
                               <p className="text-[7px] text-white/40 uppercase mb-1">LATITUDE</p>
-                              <p className="text-sm font-black italic">51.5074° N</p>
+                              <p className="text-sm font-black italic">{telemetry.lat.toFixed(4)}° N</p>
                            </div>
                            <div>
                               <p className="text-[7px] text-white/40 uppercase mb-1">LONGITUDE</p>
-                              <p className="text-sm font-black italic">0.1278° W</p>
+                              <p className="text-sm font-black italic">{telemetry.lng.toFixed(4)}° W</p>
                            </div>
                            <div>
                               <p className="text-[7px] text-white/40 uppercase mb-1">VELOCITY</p>
-                              <p className="text-sm font-black text-emerald-500">22 km/h</p>
+                              <p className="text-sm font-black text-emerald-500">{telemetry.velocity} km/h</p>
                            </div>
                         </div>
                     </div>
@@ -468,7 +565,7 @@ const TrackOrder = () => {
                 <div className="flex items-center justify-between mb-8">
                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Cargo Integrity</h3>
                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-black gradient-text">${order?.totalAmount?.toFixed(2)}</span>
+                      <span className="text-xs font-black gradient-text">₹{order?.totalAmount?.toFixed(2)}</span>
                    </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -573,8 +670,15 @@ const TrackOrder = () => {
 
       <AnimatePresence>
         {notification && (
-          <motion.div initial={{ opacity: 0, y: 50, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: 20, x: '-50%' }} className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] glass px-12 py-5 rounded-[3rem] font-black text-[10px] uppercase tracking-[0.3em] shadow-3xl border border-primary-500/40 flex items-center gap-4 text-white">
-            <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-glow"><CheckCircle2 size={16} /></div>
+          <motion.div 
+            initial={{ opacity: 0, y: -50, x: '-50%' }} 
+            animate={{ opacity: 1, y: 0, x: '-50%' }} 
+            exit={{ opacity: 0, y: -20, x: '-50%' }} 
+            className="fixed top-32 left-1/2 -translate-x-1/2 z-[100] glass px-12 py-5 rounded-[3rem] font-black text-[10px] uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(var(--primary-rgb),0.3)] border border-primary-500/40 flex items-center gap-4 text-white backdrop-blur-3xl"
+          >
+            <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(var(--primary-rgb),0.6)]">
+              <Sparkles size={16} className="animate-pulse" />
+            </div>
             {notification}
           </motion.div>
         )}

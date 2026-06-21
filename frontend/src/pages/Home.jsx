@@ -12,6 +12,7 @@ import { FoodContext } from '../context/FoodContext'
 import useCartStore from '../store/useCartStore'
 import { FoodCardSkeleton, CategorySkeleton, HomePageSkeleton } from '../components/Skeleton'
 import Logo from '../components/Logo'
+import LogoIcon from '../components/LogoIcon'
 
 // Icon mapping helper for dynamic categories
 const getCategoryIcon = (name) => {
@@ -32,6 +33,17 @@ const Home = () => {
   const navigate = useNavigate()
 
   const [reviews, setReviews] = useState([]);
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  // Hero Slideshow Logic
+  useEffect(() => {
+    if (menuItems.length > 0) {
+      const interval = setInterval(() => {
+        setHeroIndex((prev) => (prev + 1) % menuItems.length);
+      }, 3000); // Decreased speed to 3 seconds for better visibility
+      return () => clearInterval(interval);
+    }
+  }, [menuItems]);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -97,8 +109,8 @@ const Home = () => {
               <Link to="/menu" className="bg-primary-600 hover:bg-primary-700 px-8 md:px-10 py-4 md:py-5 rounded-2xl font-black flex items-center gap-3 transition-all shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] hover:translate-y-[-4px] active:scale-95 group text-sm md:text-base">
                 Explore Menu <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/recommend" className="glass px-8 md:px-10 py-4 md:py-5 rounded-2xl font-black flex items-center gap-3 border-white/5 hover:border-primary-500/30 transition-all hover:bg-primary-500/5 group text-white text-sm md:text-base">
-                <BrainCircuit size={20} className="group-hover:rotate-12 transition-transform" /> AI Suggest
+              <Link to="/recommend" className="glass px-8 md:px-10 py-4 md:py-5 rounded-2xl font-black flex items-center gap-3 border-white/5 hover:border-primary-500/30 transition-all hover:bg-primary-500/5 group text-white text-sm md:text-base relative overflow-hidden">
+                <LogoIcon size={24} className="group-hover:scale-110 transition-transform" /> AI Suggest
               </Link>
             </div>
           </motion.div>
@@ -110,16 +122,38 @@ const Home = () => {
             className="relative"
           >
             <div className="absolute inset-0 bg-primary-500/30 blur-[140px] rounded-full animate-pulse" />
-            <div className="relative z-10 glass rounded-[4rem] p-4 border-white/10 group">
+            <div className="relative z-10 glass rounded-[4rem] p-4 border-white/10 group overflow-hidden">
                <div className="absolute top-8 left-8 bg-white/10 backdrop-blur-xl px-6 py-3 rounded-2xl border border-white/10 z-20 flex items-center gap-3 animate-bounce">
                   <div className="w-3 h-3 bg-green-500 rounded-full" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-white/80">350+ Chefs Online</span>
                </div>
-               <img 
-                 src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1000" 
-                 alt="Delicious Food" 
-                 className="w-full h-[400px] md:h-[600px] object-cover rounded-[3.5rem] shadow-2xl transition-transform duration-1000 group-hover:scale-[1.02]"
-               />
+
+               <AnimatePresence mode="wait">
+                 <motion.div
+                   key={heroIndex}
+                   initial={{ opacity: 0, scale: 1.1, rotate: 1 }}
+                   animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                   exit={{ opacity: 0, scale: 0.9, rotate: -1 }}
+                   transition={{ duration: 0.5, ease: "easeInOut" }}
+                   className="relative h-[400px] md:h-[600px] w-full"
+                 >
+                   <img 
+                     src={menuItems[heroIndex]?.image || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1000"} 
+                     alt={menuItems[heroIndex]?.name || "Delicious Food"} 
+                     className="w-full h-full object-cover rounded-[3.5rem] shadow-2xl"
+                   />
+                   <div className="absolute bottom-10 left-10 right-10 z-20">
+                     <motion.div 
+                       initial={{ opacity: 0, y: 20 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       className="glass px-6 py-4 rounded-2xl border border-white/10 backdrop-blur-2xl inline-block"
+                     >
+                       <span className="text-primary-500 font-black uppercase tracking-[0.3em] text-[8px] mb-1 block">Live Showcase</span>
+                       <h4 className="text-white font-black text-xl tracking-tighter italic">{menuItems[heroIndex]?.name}</h4>
+                     </motion.div>
+                   </div>
+                 </motion.div>
+               </AnimatePresence>
             </div>
           </motion.div>
         </section>

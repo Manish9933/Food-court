@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Camera, Mail, Shield, Zap, Sparkles, Heart, Globe, Trash2, Edit3, Award, Star, ShoppingCart } from 'lucide-react'
+import { User, Camera, Mail, Shield, Zap, Sparkles, Heart, Globe, Trash2, Edit3, Award, Star, ShoppingCart, Loader2, X } from 'lucide-react'
 import useAuthStore from '../store/useAuthStore'
+import { useTheme } from '../context/ThemeContext'
 import { ProfilePageSkeleton } from '../components/Skeleton'
 
 const TASTE_MOODS = [
@@ -11,20 +12,41 @@ const TASTE_MOODS = [
   { id: 'energetic', label: 'High Energy', color: 'from-yellow-400 to-orange-400', glow: 'shadow-yellow-500/20' },
 ]
 
+const BADGES = [
+  { id: 1, title: 'Gastronaut', icon: <Globe />, desc: 'Ordered from 5+ different cuisines.', unlocked: true },
+  { id: 2, title: 'First Mission', icon: <Zap />, desc: 'Completed your very first order.', unlocked: true },
+  { id: 3, title: 'Elite Critic', icon: <Star />, desc: 'Left 10+ high-quality reviews.', unlocked: false },
+  { id: 4, title: 'Aura Master', icon: <Sparkles />, desc: 'Synced your taste aura 20 times.', unlocked: true },
+  { id: 5, title: 'Night Owl', icon: <Award />, desc: 'Placed an order after midnight.', unlocked: false },
+]
+
 const Profile = () => {
-  const { user, updateUser, loading } = useAuthStore()
+  const { user, updateProfile, loading } = useAuthStore()
+  const { applyTheme } = useTheme()
   const [isEditing, setIsEditing] = useState(false)
+  const [showBadges, setShowBadges] = useState(false)
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || ''
+  })
   const [activeMood, setActiveMood] = useState(user?.tasteMood || 'adventurous')
   const fileInputRef = useRef(null)
 
-  const handleAvatarUpload = (e) => {
+  const handleAvatarUpload = async (e) => {
     const file = e.target.files[0]
     if (file) {
       const reader = new FileReader()
-      reader.onloadend = () => {
-        updateUser({ avatar: reader.result })
+      reader.onloadend = async () => {
+        await updateProfile({ avatar: reader.result })
       }
       reader.readAsDataURL(file)
+    }
+  }
+
+  const handleSave = async () => {
+    const success = await updateProfile(formData)
+    if (success) {
+      setIsEditing(false)
     }
   }
 
@@ -96,12 +118,12 @@ const Profile = () => {
               <div className="bg-white/5 rounded-2xl p-4 flex justify-around items-center border border-white/5">
                 <div className="text-center">
                   <p className="text-[10px] text-white/30 uppercase tracking-widest font-black mb-1">Rank</p>
-                  <p className="font-black text-primary-500">Master Chief</p>
+                  <p className="font-black text-primary-500">{user?.rank || 'Rookie'}</p>
                 </div>
                 <div className="w-[1px] h-8 bg-white/10" />
                 <div className="text-center">
                   <p className="text-[10px] text-white/30 uppercase tracking-widest font-black mb-1">XP</p>
-                  <p className="font-black">12.4K</p>
+                  <p className="font-black">{(user?.xp / 1000).toFixed(1)}K</p>
                 </div>
               </div>
             </motion.div>
@@ -120,9 +142,17 @@ const Profile = () => {
                 {TASTE_MOODS.map(mood => (
                   <button
                     key={mood.id}
-                    onClick={() => {
+                    onClick={async () => {
                       setActiveMood(mood.id)
-                      updateUser({ tasteMood: mood.id })
+                      // Map mood to global theme
+                      const themeMap = {
+                        adventurous: 'purple',
+                        comfort: 'orange',
+                        healthy: 'green',
+                        energetic: 'blue'
+                      }
+                      applyTheme(themeMap[mood.id])
+                      await updateProfile({ tasteMood: mood.id })
                     }}
                     className={`p-3 rounded-2xl border transition-all text-left relative overflow-hidden group ${
                       activeMood === mood.id 
@@ -164,8 +194,9 @@ const Profile = () => {
                     <input 
                       type="text" 
                       readOnly={!isEditing}
-                      defaultValue={user?.name}
-                      className={`w-full bg-white/5 border border-white/5 p-4 rounded-2xl outline-none focus:border-primary-500/40 transition-all font-semibold ${!isEditing ? 'cursor-not-allowed text-white/60' : ''}`}
+                      value={isEditing ? formData.name : user?.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className={`w-full bg-white/5 border border-white/5 p-4 rounded-2xl outline-none focus:border-primary-500/40 transition-all font-semibold ${!isEditing ? 'cursor-not-allowed text-white/60' : 'border-primary-500/20 bg-primary-500/5'}`}
                     />
                   </div>
                   <div className="space-y-2">
@@ -175,8 +206,9 @@ const Profile = () => {
                       <input 
                         type="email" 
                         readOnly={!isEditing}
-                        defaultValue={user?.email}
-                        className={`w-full bg-white/5 border border-white/5 p-4 pl-12 rounded-2xl outline-none focus:border-primary-500/40 transition-all font-semibold ${!isEditing ? 'cursor-not-allowed text-white/60' : ''}`}
+                        value={isEditing ? formData.email : user?.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className={`w-full bg-white/5 border border-white/5 p-4 pl-12 rounded-2xl outline-none focus:border-primary-500/40 transition-all font-semibold ${!isEditing ? 'cursor-not-allowed text-white/60' : 'border-primary-500/20 bg-primary-500/5'}`}
                       />
                     </div>
                   </div>
@@ -207,7 +239,12 @@ const Profile = () => {
                         <Award size={18} className="text-primary-500" /> FoodGenie Pro
                       </h4>
                       <p className="text-xs text-white/40 leading-relaxed font-semibold">You've unlocked 15% discount on all weekend orders. Keep seasoning!</p>
-                      <button className="mt-6 w-full bg-primary-600 hover:bg-primary-700 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary-900/40 transition-all active:scale-95">View Badges</button>
+                      <button 
+                        onClick={() => setShowBadges(true)}
+                        className="mt-6 w-full bg-primary-600 hover:bg-primary-700 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary-900/40 transition-all active:scale-95"
+                      >
+                        View Badges
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -215,17 +252,23 @@ const Profile = () => {
 
               {isEditing && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex justify-end gap-4 border-t border-white/5 pt-8">
-                  <button onClick={() => setIsEditing(false)} className="px-8 py-3 rounded-2xl bg-white/5 hover:bg-white/10 font-black text-xs uppercase tracking-widest transition-all">Discard Changes</button>
-                  <button onClick={() => setIsEditing(false)} className="px-10 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 font-black text-xs uppercase tracking-widest shadow-xl shadow-primary-900/40 transition-all active:scale-95">Save Profile</button>
+                  <button onClick={() => {setIsEditing(false); setFormData({name: user?.name, email: user?.email})}} className="px-8 py-3 rounded-2xl bg-white/5 hover:bg-white/10 font-black text-xs uppercase tracking-widest transition-all">Discard Changes</button>
+                  <button 
+                    onClick={handleSave} 
+                    disabled={loading}
+                    className="px-10 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 font-black text-xs uppercase tracking-widest shadow-xl shadow-primary-900/40 transition-all active:scale-95 flex items-center gap-2"
+                  >
+                    {loading ? <><Loader2 size={14} className="animate-spin" /> Syncing...</> : 'Save Profile'}
+                  </button>
                 </motion.div>
               )}
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { label: 'Orders Completed', val: '43', icon: <ShoppingCart className="text-purple-500" /> },
-                { label: 'Favorites', val: '12', icon: <Heart className="text-red-500" /> },
-                { label: 'Taste Level', val: 'Elite', icon: <Star className="text-yellow-500" /> },
+                { label: 'Orders Completed', val: user?.ordersCompleted || 0, icon: <ShoppingCart className="text-purple-500" /> },
+                { label: 'Favorites', val: user?.favoritesCount || 0, icon: <Heart className="text-red-500" /> },
+                { label: 'Taste Level', val: user?.rank === 'Rookie' ? 'Beginner' : 'Elite', icon: <Star className="text-yellow-500" /> },
               ].map((stat, idx) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -246,6 +289,79 @@ const Profile = () => {
         </div>
       </div>
       )}
+      {/* Badges Modal */}
+      <AnimatePresence>
+        {showBadges && (
+          <div className="fixed inset-0 z-[10001] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowBadges(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl glass p-8 md:p-12 rounded-[3.5rem] md:rounded-[4.5rem] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.5)] overflow-hidden"
+            >
+              <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${selectedMood.color}`} />
+              
+              <div className="flex justify-between items-start mb-10">
+                <div>
+                  <h3 className="text-3xl md:text-4xl font-black tracking-tighter italic">Culinary <span className="gradient-text">Achievements</span></h3>
+                  <p className="text-[10px] text-white/30 uppercase font-black tracking-widest mt-2">Level Up your Gastronomic Journey</p>
+                </div>
+                <button 
+                  onClick={() => setShowBadges(false)}
+                  className="p-3 bg-white/5 hover:bg-rose-500 hover:text-white rounded-2xl transition-all text-white/40 group active:scale-90"
+                >
+                  <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {BADGES.map(badge => (
+                  <div 
+                    key={badge.id}
+                    className={`p-6 rounded-[2.5rem] border transition-all flex items-center gap-5 group ${
+                      badge.unlocked 
+                      ? 'bg-white/5 border-white/10 hover:border-primary-500/30' 
+                      : 'bg-black/20 border-white/5 opacity-40 grayscale'
+                    }`}
+                  >
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110 ${
+                      badge.unlocked ? 'bg-primary-600 text-white' : 'bg-white/5 text-white/20'
+                    }`}>
+                      {badge.icon}
+                    </div>
+                    <div>
+                      <h4 className="font-black text-sm uppercase tracking-tight">{badge.title}</h4>
+                      <p className="text-[10px] text-white/30 font-medium leading-tight mt-1">{badge.desc}</p>
+                    </div>
+                    {badge.unlocked && (
+                      <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-12 p-6 bg-primary-500/10 rounded-[2rem] border border-primary-500/20 text-center">
+                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-500">Next Milestone: Critique Legend</p>
+                 <div className="w-full h-1.5 bg-white/5 rounded-full mt-4 overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: '65%' }}
+                      transition={{ duration: 1.5, delay: 0.5 }}
+                      className="h-full bg-primary-500 shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" 
+                    />
+                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import useCartStore from '../store/useCartStore'
 import { FoodContext } from '../context/FoodContext'
 import { RecommendPageSkeleton } from '../components/Skeleton'
+import LogoIcon from '../components/LogoIcon'
 
 const MOODS = [
   { id: 'adventurous', label: 'Adventurous', icon: <Sparkles />, color: 'from-purple-500/30 to-blue-500/30', activeColor: 'bg-purple-600', tag: 'Spicy / Exotic' },
@@ -79,8 +80,8 @@ const Recommend = () => {
           
           {step === 1 && (
             <motion.div key="s1" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, x: -100 }} className="text-center">
-              <div className="bg-primary-500/10 w-24 h-24 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 border border-primary-500/20 shadow-2xl">
-                <BrainCircuit className="text-primary-500" size={48} />
+              <div className="w-24 h-24 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 relative">
+                <LogoIcon size={80} />
               </div>
               <h1 className="text-6xl font-black mb-6 tracking-tighter leading-none">Find Your <span className="gradient-text">Mood</span> Food</h1>
               <p className="text-white/40 text-xl font-medium mb-16">How are you feeling right now?</p>
@@ -115,8 +116,10 @@ const Recommend = () => {
           {isThinking && (
             <motion.div key="load" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-dark-900/95 backdrop-blur-[100px] z-50 flex flex-col items-center justify-center text-center">
                 <div className="relative mb-12">
-                  <motion.div animate={{ rotate: 360, scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2.5 }} className="w-40 h-40 border-[3px] border-primary-500/10 border-t-primary-500 rounded-full shadow-[0_0_80px_rgba(var(--primary-rgb),0.2)]" />
-                  <BrainCircuit className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary-500" size={60} />
+                  <motion.div animate={{ rotate: 360, scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2.5 }} className="w-40 h-40 border-[3px] border-primary-500/10 border-t-primary-500 rounded-[3rem] shadow-[0_0_80px_rgba(var(--primary-rgb),0.2)]" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+                    <LogoIcon size={70} />
+                  </div>
                 </div>
                <h3 className="text-4xl font-black mb-4 tracking-tight">AI is picking your food...</h3>
                <p className="text-white/30 font-medium tracking-widest uppercase text-[10px]">Looking for the best options</p>
@@ -148,7 +151,7 @@ const Recommend = () => {
                 <div className="p-8 pt-10 flex flex-col gap-6">
                   <div className="flex justify-between items-center px-4">
                      <span className="text-white/40 uppercase font-black text-[10px] tracking-widest">Price</span>
-                     <span className="text-5xl font-black gradient-text">${result.price.toFixed(2)}</span>
+                     <span className="text-5xl font-black gradient-text">₹{result.price.toFixed(2)}</span>
                   </div>
                   
                   <div className="flex gap-4 mt-4">

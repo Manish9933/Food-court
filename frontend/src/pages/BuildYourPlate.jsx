@@ -216,6 +216,80 @@ const BuildYourPlate = () => {
     })
   }, [addToast, dismissToast])
 
+  const handleAddCombo = useCallback((comboName) => {
+    // 1. Snapshot for undo
+    const snapBefore = [...plateItemsRef.current]
+    
+    // 2. Define combo blueprints (item names)
+    const combos = {
+      'Classic Thali': [
+        { name: 'Roti', qty: 2 },
+        { name: 'Dal Makhani', qty: 1 },
+        { name: 'Jeera Rice', qty: 1 },
+        { name: 'Garden Salad', qty: 1 }
+      ],
+      'Paneer Feast': [
+        { name: 'Butter Naan', qty: 2 },
+        { name: 'Paneer Butter Masala', qty: 1 },
+        { name: 'Boondi Raita', qty: 1 }
+      ],
+      'Biryani Combo': [
+        { name: 'Veg Biryani', qty: 1 },
+        { name: 'Boondi Raita', qty: 1 },
+        { name: 'Garden Salad', qty: 1 }
+      ],
+      'Chef\'s Special': [
+        { name: 'Garlic Naan', qty: 2 },
+        { name: 'Paneer Butter Masala', qty: 1 },
+        { name: 'Mix Veg', qty: 1 },
+        { name: 'Boondi Raita', qty: 1 }
+      ],
+      'Light Lunch': [
+        { name: 'Roti', qty: 1 },
+        { name: 'Dal Makhani', qty: 1 },
+        { name: 'Mixed Pickle', qty: 1 }
+      ],
+      'Royal Feast': [
+        { name: 'Butter Naan', qty: 2 },
+        { name: 'Paneer Butter Masala', qty: 1 },
+        { name: 'Veg Biryani', qty: 1 },
+        { name: 'Garden Salad', qty: 1 }
+      ]
+    }
+
+    const blueprint = combos[comboName]
+    if (!blueprint) return
+
+    // 3. Construct new plate items
+    let newItems = []
+    blueprint.forEach(blueprintItem => {
+      const menuRef = allPlateItems.find(i => i.name === blueprintItem.name)
+      if (menuRef) {
+        for (let i = 0; i < blueprintItem.qty; i++) {
+          newItems.push({
+            ...menuRef,
+            instanceId: `${menuRef.id}-${Date.now()}-${Math.random()}`
+          })
+        }
+      }
+    })
+
+    if (newItems.length > 0) {
+      setPlateItems(newItems)
+      const toastId = addToast({
+        message: `${comboName} activated!`,
+        emoji: '🍱',
+        onUndo: () => {
+          setPlateItems(snapBefore)
+          dismissToast(toastId)
+          addToast({ message: 'Previous plate restored!', emoji: '↩️' })
+        }
+      })
+    } else {
+      addToast({ message: 'Combo items not available in current menu', emoji: '⚠️' })
+    }
+  }, [allPlateItems, addToast, dismissToast])
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#0a0a0b]">
       {isLoading ? (
@@ -307,7 +381,7 @@ const BuildYourPlate = () => {
                   plateItems={plateItems}
                   onRemoveItem={handleOrderSummaryRemove}
                   onClearPlate={handleClearPlate}
-                  onAddCombo={() => {}} 
+                  onAddCombo={handleAddCombo} 
                 />
               </motion.div>
             </div>

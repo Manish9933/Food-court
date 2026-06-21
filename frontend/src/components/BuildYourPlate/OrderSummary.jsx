@@ -248,20 +248,23 @@ const OrderSummary = ({ plateItems, onRemoveItem, onClearPlate, onAddCombo }) =>
             <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/15 mb-2 text-center">
               Try a Combo
             </p>
-            <div className="space-y-1.5">
+            <div className="grid grid-cols-2 gap-1.5">
               {[
-                { name: 'Classic Thali', icon: <LogoIcon size={20} /> },
-                { name: 'Paneer Feast',  icon: <LogoIcon size={20} /> },
-                { name: 'Biryani Combo', icon: <LogoIcon size={20} /> },
+                { name: 'Classic Thali', icon: '🍱' },
+                { name: 'Paneer Feast',  icon: '🥘' },
+                { name: 'Biryani Combo', icon: '🍚' },
+                { name: 'Chef\'s Special', icon: '👨‍🍳' },
+                { name: 'Light Lunch', icon: '🥗' },
+                { name: 'Royal Feast', icon: '👑' },
               ].map((combo) => (
                 <button
                   key={combo.name}
                   onClick={() => onAddCombo(combo.name)}
-                  className="w-full px-4 py-2.5 rounded-xl
+                  className="w-full px-3 py-2 rounded-xl
                              border border-white/5 bg-white/[0.02]
                              hover:border-primary-500/30 hover:bg-primary-500/5
                              text-white/30 hover:text-white/70
-                             flex items-center gap-2.5 text-[11px] font-black transition-all"
+                             flex items-center gap-2 text-[10px] font-black transition-all"
                 >
                   <span className="text-base">{combo.icon || combo.emoji}</span>
                   {combo.name}

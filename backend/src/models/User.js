@@ -6,6 +6,12 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  avatar: { type: String, default: '' },
+  tasteMood: { type: String, default: 'adventurous' },
+  rank: { type: String, default: 'Rookie' },
+  xp: { type: Number, default: 0 },
+  ordersCompleted: { type: Number, default: 0 },
+  favoritesCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
 

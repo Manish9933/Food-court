@@ -84,6 +84,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
               key={link.path}
               to={link.path}
               className={`flex items-center gap-4 px-4 py-3.5 rounded-xl group transition-all duration-300 relative ${
+                isActive
                   ? "bg-gradient-to-r from-primary-500/10 to-transparent text-primary-500"
                   : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
               }`}

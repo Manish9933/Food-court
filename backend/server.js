@@ -27,6 +27,7 @@ app.use('/api/notifications', require('./src/routes/notification.routes.js'));
 app.use('/api/chat', require('./src/routes/chat.js'));
 app.use('/api/dashboard', require('./src/routes/dashboard.routes.js'));
 app.use('/api/delivery-boys', require('./src/routes/deliveryBoy.routes.js'));
+app.use('/api/payments', require('./src/routes/payment.routes.js'));
 
 
 app.get('/', (req, res) => {
@@ -44,8 +45,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Port configuration
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+// Port configuration (local dev only)
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  });
+}
+
+// Export for Vercel Serverless
+module.exports = app;

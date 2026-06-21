@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Plus, Star, Loader2, UtensilsCrossed } from 'lucide-react'
+import { Search, Plus, Minus, Star, Loader2, UtensilsCrossed } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import useCartStore from '../store/useCartStore'
 import { FoodContext } from '../context/FoodContext'
@@ -11,6 +11,9 @@ const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const { menuItems, categories, isLoading, refreshData } = useContext(FoodContext)
   const addToCart = useCartStore((state) => state.addToCart)
+  const updateQuantity = useCartStore((state) => state.updateQuantity)
+  const removeFromCart = useCartStore((state) => state.removeFromCart)
+  const cart = useCartStore((state) => state.cart)
   const location = useLocation()
 
   React.useEffect(() => {
@@ -160,25 +163,62 @@ const Menu = () => {
                   <div className="p-10 flex flex-col flex-1">
                     <div className="flex justify-between items-start mb-3">
                       <span className="text-[10px] text-primary-500 font-black uppercase tracking-[0.3em]">{item.category}</span>
-                      <span className="text-xl font-black gradient-text">${item.price.toFixed(2)}</span>
+                      <span className="text-xl font-black gradient-text">₹{item.price.toFixed(2)}</span>
                     </div>
                     <h3 className="text-2xl font-bold mb-4 tracking-tight leading-tight text-white/90">{item.name}</h3>
                     <p className="text-white/30 text-sm leading-relaxed mb-10 line-clamp-2 font-medium">{item.description}</p>
                     
-                    <button
-                      disabled={!item.isAvailable}
-                      onClick={() => addToCart(item)}
-                      className={`mt-auto w-full py-5 rounded-[1.5rem] font-black flex items-center justify-center gap-3 transition-all border border-white/5 shadow-2xl group/btn ${
-                        item.isAvailable 
-                          ? 'bg-white/5 hover:bg-primary-600 hover:translate-y-[-4px] active:scale-95' 
-                          : 'bg-white/5 opacity-50 cursor-not-allowed'
-                      }`}
-                    >
-                      <Plus size={22} className={`text-white/20 ${item.isAvailable ? 'group-hover/btn:text-white' : ''}`} />
-                      <span className={`text-white/30 uppercase tracking-[0.2em] text-[10px] ${item.isAvailable ? 'group-hover/btn:text-white' : ''}`}>
-                        {item.isAvailable ? 'Add to Order' : 'Sold Out'}
-                      </span>
-                    </button>
+                    {(() => {
+                      const cartItem = cart.find(i => (i._id || i.id) === (item._id || item.id));
+                      const quantity = cartItem ? cartItem.quantity : 0;
+
+                      if (quantity > 0) {
+                        return (
+                          <div className="mt-auto flex items-center justify-between bg-primary-600/10 p-2 rounded-[1.5rem] border border-primary-500/20">
+                            <button 
+                              onClick={() => quantity === 1 ? removeFromCart(item._id || item.id) : updateQuantity(item._id || item.id, quantity - 1)}
+                              className="w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl transition-all text-white active:scale-90"
+                            >
+                              <Minus size={18} />
+                            </button>
+                            <AnimatePresence mode="wait">
+                              <motion.span 
+                                key={quantity}
+                                initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -10, scale: 0.8 }}
+                                className="text-lg font-black text-white px-4"
+                              >
+                                {quantity}
+                              </motion.span>
+                            </AnimatePresence>
+                            <button 
+                              onClick={() => addToCart(item)}
+                              className="w-12 h-12 flex items-center justify-center bg-primary-600 hover:bg-primary-500 rounded-xl transition-all text-white active:scale-90 shadow-lg shadow-primary-900/40"
+                            >
+                              <Plus size={18} />
+                            </button>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <button
+                          disabled={!item.isAvailable}
+                          onClick={() => addToCart(item)}
+                          className={`mt-auto w-full py-5 rounded-[1.5rem] font-black flex items-center justify-center gap-3 transition-all border border-white/5 shadow-2xl group/btn ${
+                            item.isAvailable 
+                              ? 'bg-white/5 hover:bg-primary-600 hover:translate-y-[-4px] active:scale-95' 
+                              : 'bg-white/5 opacity-50 cursor-not-allowed'
+                          }`}
+                        >
+                          <Plus size={22} className={`text-white/20 ${item.isAvailable ? 'group-hover/btn:text-white' : ''}`} />
+                          <span className={`text-white/30 uppercase tracking-[0.2em] text-[10px] ${item.isAvailable ? 'group-hover/btn:text-white' : ''}`}>
+                            {item.isAvailable ? 'Add to Order' : 'Sold Out'}
+                          </span>
+                        </button>
+                      );
+                    })()}
                   </div>
                 </motion.div>
               ))}
