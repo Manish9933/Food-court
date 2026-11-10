@@ -23,7 +23,10 @@ const connectDB = async () => {
       });
     } catch (error) {
       console.error(`❌ Error: ${error.message}`);
-      process.exit(1);
+      if (!process.env.VERCEL) {
+        process.exit(1);
+      }
+      throw error;
     }
   }
 

@@ -28,7 +28,8 @@ const Login = () => {
           navigate('/')
         }
       } else {
-          setErrorMsg('Invalid email or password access protocol.')
+          const authError = useAuthStore.getState().error;
+          setErrorMsg(authError || 'Invalid email or password access protocol.')
       }
     } catch (error) {
       console.error(error)

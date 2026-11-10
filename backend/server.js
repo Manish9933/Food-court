@@ -16,6 +16,17 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(morgan('dev'));
 
+// Ensure DB connected on serverless invocations
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection error:', err);
+    res.status(500).json({ message: 'Database connection failed' });
+  }
+});
+
 // Routes
 app.use('/api/menu', require('./src/routes/menu.routes.js'));
 app.use('/api/food', require('./src/routes/menu.routes.js')); // Alias as per requirement

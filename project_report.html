@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FoodGenie – Training Report</title>
+  <style>
+    /* ─── RESET ─────────────────────────────────────────────── */
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    /* ─── BODY / BASE FONT ──────────────────────────────────── */
+    /* Rule (b): Times New Roman, Normal = 12pt Regular          */
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      font-weight: 400;
+      color: #000;
+      background: #e0e0e0;          /* screen only – neutral grey surround */
+      line-height: 1.5;             /* Rule (d): 1.5 line spacing           */
+    }
+
+    /* ─── SCREEN PRINT BUTTON ───────────────────────────────── */
+    .no-print {
+      position: fixed; top: 16px; right: 16px; z-index: 9999;
+      background: #1a237e; color: #fff; border: none;
+      padding: 10px 22px; border-radius: 5px; font-size: 13px;
+      cursor: pointer; font-family: Arial, sans-serif; font-weight: bold;
+      box-shadow: 0 3px 10px rgba(0,0,0,.35);
+    }
+    .no-print:hover { background: #283593; }
+
+    /* ─── PAGE WRAPPER ──────────────────────────────────────── */
+    /* A4: 210 × 297 mm                                          */
+    /* Rule (c): Top=1in, Bottom=1in, Right=1in, Left=1.5in      */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 12px auto;
+      padding-top:    25.4mm;   /* 1 inch  */
+      padding-bottom: 25.4mm;   /* 1 inch  */
+      padding-right:  25.4mm;   /* 1 inch  */
+      padding-left:   38.1mm;   /* 1.5 inch */
+      background: #fff;
+      position: relative;
+      page-break-after: always;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);  /* screen only */
+    }
+
+    /* ─── PRINT OVERRIDES ──────────────────────────────────── */
+    @media print {
+      body    { background: #fff; }
+      .page   {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+      }
+      .no-print { display: none !important; }
+    }
+
+    /* ─── TYPOGRAPHY RULES ──────────────────────────────────── */
+    /* Rule (b):                                                  */
+    /*   Chapter Heading = 16pt Bold                             */
+    /*   Titles (section headings) = 14pt Bold                   */
+    /*   Normal Text = 12pt Regular                              */
+
+    /* Chapter heading banner */
+    .ch-heading {
+      text-align: center;
+      margin-bottom: 18pt;
+      padding-bottom: 8pt;
+      border-bottom: 2px solid #000;
+    }
+    .ch-label {
+      font-size: 16pt;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .ch-title {
+      font-size: 16pt;        /* Rule (b): Chapter Heading 16pt Bold */
+      font-weight: bold;
+      text-decoration: underline;
+      margin-top: 4pt;
+    }
+
+    /* Section titles h2 → 14pt Bold */
+    h2 {
+      font-size: 14pt;        /* Rule (b): Titles 14pt Bold */
+      font-weight: bold;
+      margin-top: 16pt;
+      margin-bottom: 6pt;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    /* Sub-section h3 → 12pt Bold */
+    h3 {
+      font-size: 12pt;
+      font-weight: bold;
+      margin-top: 10pt;
+      margin-bottom: 4pt;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    /* Normal paragraph */
+    p {
+      font-size: 12pt;
+      font-weight: 400;
+      margin-bottom: 10pt;
+      text-align: justify;
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      margin: 6pt 0 8pt 22pt;
+    }
+    li {
+      font-size: 12pt;
+      margin-bottom: 4pt;
+      line-height: 1.5;
+    }
+
+    /* ─── PAGE NUMBER – BOTTOM CENTER ──────────────────────── */
+    /* Rule (e): page numbers at bottom middle                   */
+    .pg-num {
+      position: absolute;
+      bottom: 10mm;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 11pt;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    /* ─── COVER PAGE ────────────────────────────────────────── */
+    .cover { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 245mm; }
+    .cover-top    { width:100%; }
+    .cover-middle { width:100%; margin: auto 0; }
+    .cover-bottom { width:100%; }
+
+    .univ-name  { font-size:16pt; font-weight:bold; text-transform:uppercase; margin-bottom:3pt; }
+    .dept-name  { font-size:14pt; font-weight:bold; margin-bottom:3pt; }
+    .dept-sub   { font-size:12pt; margin-bottom:0; }
+    .cover-rule { border:none; border-top:2px solid #000; margin:14pt 0; }
+
+    .rpt-box    { border:2px solid #000; padding:10pt 24pt; display:inline-block; margin-bottom:10pt; }
+    .rpt-box p  { font-size:16pt; font-weight:bold; text-transform:uppercase; margin:0; }
+
+    .proj-title { font-size:14pt; font-weight:bold; margin-bottom:18pt; line-height:1.5; }
+
+    .det-table  { border-collapse:collapse; margin:0 auto; width:82%; }
+    .det-table td { font-size:12pt; padding:4pt 10pt; }
+    .det-table td:first-child { font-weight:bold; text-align:right; }
+    .session    { font-size:12pt; font-weight:bold; margin-top:18pt; }
+
+    /* ─── PRE-CHAPTER SECTIONS (Declaration, Cert, etc.) ───── */
+    .pre-ch-title {
+      font-size: 16pt;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: underline;
+      margin-bottom: 18pt;
+    }
+
+    /* ─── CERT / DECLARATION BOX ───────────────────────────── */
+    .cert-box {
+      border: 2px solid #000;
+      padding: 16pt 18pt;
+      margin: 14pt 0;
+    }
+
+    /* ─── SIGNATURE ROW ─────────────────────────────────────── */
+    .sig-row  { display:flex; justify-content:space-between; margin-top:36pt; }
+    .sig-blk  { text-align:center; }
+    .sig-line { border-top:1px solid #000; width:110pt; margin:0 auto 3pt; }
+
+    /* ─── TABLE OF CONTENTS ─────────────────────────────────── */
+    .toc-title {
+      font-size: 16pt; font-weight: bold;
+      text-align: center; text-decoration: underline;
+      margin-bottom: 20pt;
+    }
+    .toc-tbl  { width:100%; border-collapse:collapse; }
+    .toc-tbl td { font-size:12pt; padding:6pt 3pt; }
+    .toc-item { font-weight:bold; }
+    .toc-fill { width:99%; }
+    .toc-fill span {
+      display:block;
+      border-bottom:1px dotted #000;
+      height:1em;
+    }
+    .toc-pg   { text-align:right; white-space:nowrap; font-weight:bold; min-width:40pt; }
+    .toc-gap  { height:10pt; }
+
+    /* ─── DATA TABLES ────────────────────────────────────────── */
+    /* Rule (f): numbered as 1.1, 2.1, etc.                       */
+    .tbl-caption {
+      font-size:12pt; font-weight:bold;
+      text-align:center; margin-bottom:4pt;
+    }
+    table.dt {
+      width:100%; border-collapse:collapse; margin:6pt 0 12pt;
+    }
+    table.dt th {
+      border:1px solid #000; padding:5pt 7pt;
+      font-size:12pt; font-weight:bold;
+      background:#f0f0f0; text-align:left;
+    }
+    table.dt td {
+      border:1px solid #000; padding:4pt 7pt;
+      font-size:12pt; text-align:left;
+    }
+
+    /* ─── CODE / PRE ─────────────────────────────────────────── */
+    pre {
+      background:#f5f5f5;
+      border:1px solid #ccc;
+      border-left:4px solid #1a237e;
+      padding:7pt 9pt;
+      font-family:"Courier New", Courier, monospace;
+      font-size:9pt;
+      line-height:1.4;
+      margin:8pt 0 12pt;
+      white-space:pre-wrap;
+      word-wrap:break-word;
+    }
+
+    /* ─── ARCHITECTURE / FLOW DIAGRAM ───────────────────────── */
+    .flow { text-align:center; margin:14pt 0; }
+    .flow-box {
+      display:inline-block;
+      border:1.5px solid #000;
+      padding:5pt 14pt;
+      margin:2pt 4pt;
+      font-size:12pt;
+    }
+    .flow-arr { display:block; font-size:16pt; margin:2pt 0; }
+
+    /* ─── MISC ───────────────────────────────────────────────── */
+    .gap { height:14pt; }
+    sup { font-size:8pt; }
+  </style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+
+<!-- ══════════════════════════════════════════════════════════════
+     COVER PAGE  (not numbered)
+══════════════════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-top">
+    <p class="univ-name">Rajasthan ILD Skills University</p>
+    <p class="dept-name">School of Computer Science &amp; Engineering</p>
+    <p class="dept-sub">Department of Computer Science &amp; Engineering, Jaipur</p>
+    <hr class="cover-rule"/>
+
+    <div class="rpt-box"><p>Training / Project Report</p></div>
+    <p style="font-size:13pt;margin:6pt 0;">On</p>
+    <p class="proj-title">
+      "FoodGenie – An AI-Powered Food Court<br/>
+      Ordering &amp; Discovery Platform"
+    </p>
+    <p style="font-size:12pt;margin-bottom:6pt;">
+      Submitted in partial fulfilment of the requirements for the degree of
+    </p>
+    <p style="font-size:13pt;font-weight:bold;margin-bottom:16pt;">
+      Bachelor of Technology<br/>(Computer Science &amp; Engineering)
+    </p>
+    <hr class="cover-rule"/>
+  </div>
+
+  <div class="cover-middle">
+    <p style="font-size:12pt;margin-bottom:4pt;">Submitted By</p>
+    <p style="font-size:14pt;font-weight:bold;margin-bottom:10pt;">Manish Kumar</p>
+    <table class="det-table">
+      <tr><td>Enrollment No. :</td><td>RISU-CS-2021-0042</td></tr>
+      <tr><td>Semester :</td>      <td>8<sup>th</sup> Semester</td></tr>
+      <tr><td>Branch :</td>        <td>Computer Science &amp; Engineering</td></tr>
+      <tr><td>Faculty Guide :</td> <td>Prof. [Guide Name]</td></tr>
+      <tr><td>HOD :</td>           <td>Dr. [HOD Name]</td></tr>
+    </table>
+  </div>
+
+  <div class="cover-bottom">
+    <hr class="cover-rule"/>
+    <p class="session">Academic Session: 2024 – 2025</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     DECLARATION  (page i)
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="pre-ch-title">Declaration</p>
+
+  <p>I, <strong>Manish Kumar</strong>, Enrollment No. RISU-CS-2021-0042, student of B.Tech (Computer Science &amp; Engineering), 8<sup>th</sup> Semester, Rajasthan ILD Skills University, Jaipur, hereby declare that the training report entitled <em>"FoodGenie – An AI-Powered Food Court Ordering &amp; Discovery Platform"</em> submitted in partial fulfilment of the requirements for the degree of Bachelor of Technology is the record of original work done by me under the supervision of <strong>Prof. [Guide Name]</strong>, Department of Computer Science &amp; Engineering.</p>
+
+  <p>The matter embodied in this report has not been submitted by me, either in whole or in part, for the award of any other degree, diploma, or certificate to this or any other university or institution.</p>
+
+  <p>All sources of information and literature consulted during the preparation of this report have been duly acknowledged.</p>
+
+  <div class="gap"></div>
+  <div class="gap"></div>
+
+  <div class="sig-row">
+    <div class="sig-blk">
+      <p>Place: Jaipur</p>
+      <p>Date: _______________</p>
+    </div>
+    <div class="sig-blk">
+      <div class="sig-line"></div>
+      <p><strong>Manish Kumar</strong><br/>Enrollment No.: RISU-CS-2021-0042</p>
+    </div>
+  </div>
+
+  <div class="pg-num">i</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CERTIFICATE  (page ii)
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="pre-ch-title">Certificate</p>
+
+  <div class="cert-box">
+    <p>This is to certify that the training report entitled <em>"FoodGenie – An AI-Powered Food Court Ordering &amp; Discovery Platform"</em> submitted by <strong>Manish Kumar</strong> (Enrollment No.: RISU-CS-2021-0042) in partial fulfilment of the requirements for the award of the degree of <strong>Bachelor of Technology in Computer Science &amp; Engineering</strong> from <strong>Rajasthan ILD Skills University, Jaipur</strong>, is a record of bonafide work carried out by the student under our guidance and supervision.</p>
+
+    <p>The work embodied in this report has not been submitted for the award of any other degree or diploma to this or any other university or institution.</p>
+
+    <p>We recommend this report for acceptance.</p>
+  </div>
+
+  <div class="gap"></div>
+
+  <div class="sig-row">
+    <div class="sig-blk">
+      <div class="sig-line"></div>
+      <p><strong>Prof. [Guide Name]</strong><br/>Faculty Guide<br/>Dept. of CS&amp;E, RISU</p>
+    </div>
+    <div class="sig-blk">
+      <div class="sig-line"></div>
+      <p><strong>Dr. [HOD Name]</strong><br/>Head of Department<br/>Dept. of CS&amp;E, RISU</p>
+    </div>
+    <div class="sig-blk">
+      <div class="sig-line"></div>
+      <p><strong>Prof. [Examiner]</strong><br/>External Examiner</p>
+    </div>
+  </div>
+
+  <p style="margin-top:20pt;"><strong>Date:</strong> _______________&nbsp;&nbsp;&nbsp;&nbsp;<strong>Place:</strong> Jaipur, Rajasthan</p>
+
+  <div class="pg-num">ii</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ABSTRACT  (page iii)
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="pre-ch-title">Abstract</p>
+
+  <p>The rapid advancement of Artificial Intelligence (AI) and web technologies has opened new frontiers for digital transformation in the food service industry. This report presents <strong>FoodGenie</strong>, an AI-powered food court ordering and discovery platform developed using the MERN stack — MongoDB, Express.js, React.js, and Node.js. The system integrates Large Language Model (LLM) capabilities via the Groq API to provide intelligent, personalised dish recommendations based on user mood, dietary preferences, and budget constraints.</p>
+
+  <p>Traditional food ordering applications suffer from "decision fatigue" — a problem that arises when users are confronted with static, unfiltered menus containing hundreds of items. FoodGenie addresses this challenge by embedding a real-time AI concierge — the "Genie" — that acts as a smart food advisor, significantly elevating the user experience and increasing the average order value (AOV).</p>
+
+  <p>The frontend is developed with React.js and styled using Tailwind CSS with a premium glassmorphism design language enriched with Framer Motion animations. The backend is a RESTful API powered by Node.js and Express.js, persisting data in MongoDB Atlas. The system supports secure JWT-based authentication, dynamic order tracking, a comprehensive admin command centre, delivery boy management, Razorpay payment gateway integration, and push notifications.</p>
+
+  <p>The platform is fully deployed on Vercel using a serverless architecture for the backend API and a Vite-built static bundle for the frontend. Performance optimisations include MongoDB connection caching for serverless environments, lazy-loaded images sourced dynamically from the Pexels API, and code-split React routes.</p>
+
+  <p><strong>Keywords:</strong> AI Recommendation, MERN Stack, Food Ordering, Glassmorphism UI, JWT Authentication, Groq LLM, Vercel Serverless, Razorpay, Order Tracking, Node.js.</p>
+
+  <div class="pg-num">iii</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ACKNOWLEDGEMENTS  (page iv)
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="pre-ch-title">Acknowledgements</p>
+
+  <p>I would like to express my sincere gratitude to all those who have supported and guided me throughout the course of this training and the preparation of this report.</p>
+
+  <p>First and foremost, I am deeply grateful to my faculty guide, <strong>Prof. [Guide Name]</strong>, Department of Computer Science &amp; Engineering, Rajasthan ILD Skills University, for his/her invaluable guidance, continuous encouragement, and constructive feedback at every stage of the project. The work would not have taken its present shape without his/her expert mentorship.</p>
+
+  <p>I extend my heartfelt thanks to <strong>Dr. [HOD Name]</strong>, Head of the Department of Computer Science &amp; Engineering, for providing the necessary resources, infrastructure, and enabling academic environment for research and development activities.</p>
+
+  <p>I am also thankful to all the faculty members of the Department of Computer Science &amp; Engineering for their academic support and knowledge sharing throughout my course of study at RISU.</p>
+
+  <p>I am grateful to the open-source community — particularly the developers and contributors behind React.js, Node.js, MongoDB, the Groq API, Framer Motion, and Tailwind CSS — whose tools form the technical foundation of this project.</p>
+
+  <p>Finally, I owe an immense debt of gratitude to my family and friends for their unwavering moral support, patience, and encouragement during the development of this project.</p>
+
+  <div class="gap"></div>
+  <div class="gap"></div>
+
+  <div class="sig-row">
+    <div style="flex:1"></div>
+    <div class="sig-blk">
+      <div class="sig-line"></div>
+      <p><strong>Manish Kumar</strong><br/>RISU-CS-2021-0042</p>
+    </div>
+  </div>
+
+  <div class="pg-num">iv</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     INTERNSHIP CERTIFICATE  (page v)
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="pre-ch-title">Internship Certificate</p>
+
+  <div class="cert-box" style="min-height:210pt; text-align:center; padding:30pt 20pt;">
+    <p style="font-size:14pt;font-weight:bold;margin-bottom:16pt;">[Organisation Letterhead]</p>
+    <p>This is to certify that <strong>Manish Kumar</strong> (Enrollment No.: RISU-CS-2021-0042), student of B.Tech (CS&amp;E), Rajasthan ILD Skills University, Jaipur, has successfully completed his internship / training at <strong>[Organisation Name]</strong> from <strong>[Start Date]</strong> to <strong>[End Date]</strong>.</p>
+    <p style="margin-top:12pt;">During the tenure, the student worked on full-stack web development and AI integration projects, and demonstrated commendable technical skills, professionalism, and commitment to quality.</p>
+    <p style="margin-top:12pt;">We wish him/her success in all future endeavours.</p>
+    <div class="sig-row" style="margin-top:50pt;">
+      <div class="sig-blk">
+        <div class="sig-line"></div>
+        <p><strong>[Supervisor Name]</strong><br/>Designation<br/>Organisation Name</p>
+      </div>
+      <div class="sig-blk">
+        <p>Date: _______________</p>
+        <div style="margin-top:20pt;border:1px solid #999;width:80pt;height:60pt;margin-left:auto;margin-right:auto;display:flex;align-items:center;justify-content:center;font-size:10pt;color:#888;">Seal</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pg-num">v</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ABOUT THE ORGANISATION  (page vi)
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="pre-ch-title">About the Organisation</p>
+
+  <h2>Rajasthan ILD Skills University (RISU)</h2>
+  <p>Rajasthan ILD Skills University (RISU), Jaipur, is a state-of-the-art skills-focused university established under the Rajasthan ILD Skills University Act, 2017. The university was founded with the mission of bridging the gap between academia and industry by producing graduates who are immediately employable and capable of contributing to the rapidly evolving technology landscape.</p>
+
+  <p>The School of Computer Science &amp; Engineering at RISU offers undergraduate and postgraduate programmes in areas such as cloud computing, artificial intelligence, full-stack web development, data science, and cybersecurity. The curriculum is continuously updated in active collaboration with industry partners to ensure alignment with current and emerging technology trends.</p>
+
+  <h2>Vision</h2>
+  <p>To be a globally recognised, industry-integrated skills university that fosters innovation, entrepreneurship, and sustainable employability among its graduates.</p>
+
+  <h2>Mission</h2>
+  <ul>
+    <li>Impart quality, skill-based education aligned with national and international industry standards.</li>
+    <li>Promote a culture of research, innovation, and project-centric experiential learning.</li>
+    <li>Build strategic partnerships with leading technology organisations for hands-on exposure and placement support.</li>
+    <li>Foster ethical, responsible, and socially aware technology professionals.</li>
+  </ul>
+
+  <h2>Infrastructure &amp; Facilities</h2>
+  <p>The university is equipped with modern computer laboratories, high-speed fibre internet connectivity, a state-of-the-art digital library, innovation labs, maker spaces, and dedicated start-up incubation centres. The computing infrastructure includes GPU-enabled workstations for AI/ML coursework and industry-standard development environments.</p>
+
+  <div class="pg-num">vi</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="toc-title">Table of Contents</p>
+
+  <table class="toc-tbl">
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td class="toc-item">Declaration</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">i</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td class="toc-item">Certificate</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">ii</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td>Abstract</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">iii</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td>Acknowledgements</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">iv</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td>Internship Certificate</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">v</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td>About the Organisation</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">vi</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td class="toc-item">Chapter 1 : Introduction</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">1 – 4</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td class="toc-item">Chapter 2 : System Analysis</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">5 – 8</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td class="toc-item">Chapter 3 : Software Requirement Specifications</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">9 – 13</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td class="toc-item">Chapter 4 : Technology Used</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">14 – 18</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td class="toc-item">Chapter 5 : Coding and Screen Shots</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">19 – 26</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td class="toc-item">Chapter 6 : Conclusions / Findings / Future Scope</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">27 – 29</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td>Bibliography</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">30 – 32</td>
+    </tr>
+    <tr class="toc-gap"><td colspan="3"></td></tr>
+    <tr>
+      <td>Plagiarism Report</td>
+      <td class="toc-fill"><span></span></td>
+      <td class="toc-pg">33 – 34</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CHAPTER 1 – INTRODUCTION   Page 1
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="ch-heading">
+    <div class="ch-label">Chapter 1</div>
+    <div class="ch-title">Introduction</div>
+  </div>
+
+  <h2>1.1 Background</h2>
+  <p>The global online food delivery market has witnessed exponential growth over the last decade, driven by the convergence of mobile internet penetration, changing consumer behaviour, and the widespread adoption of digital payment systems. According to Statista (2024), the online food delivery segment is projected to generate global revenue exceeding USD 1.65 trillion by 2027, growing at a compound annual growth rate (CAGR) of approximately 10.17%.</p>
+
+  <p>Despite this remarkable growth, most food ordering platforms continue to operate on a fundamentally static paradigm — presenting users with long, unfiltered menus and providing little in the way of personalised guidance. This results in "decision fatigue," leading to lower user satisfaction, reduced order frequency, and elevated cart abandonment rates.</p>
+
+  <p>The emergence of Large Language Models (LLMs) and accessible AI inference APIs presents an unprecedented opportunity to reinvent the food discovery experience. By embedding conversational intelligence directly into the ordering workflow, a platform can function as a personal gastronomy concierge — one that understands user mood, dietary constraints, and budget to deliver hyper-relevant recommendations in real time.</p>
+
+  <h2>1.2 Project Overview</h2>
+  <p><strong>FoodGenie</strong> is an AI-powered food court ordering and discovery platform built to address these challenges. Developed on the MERN stack — MongoDB, Express.js, React.js, and Node.js — it integrates the Groq LLM API to provide an intelligent "Genie" concierge experience. The platform features a premium glassmorphism user interface, a robust admin dashboard, real-time order tracking, gamification elements, and a serverless cloud deployment architecture on Vercel.</p>
+
+  <h2>1.3 Objectives of the Project</h2>
+  <ul>
+    <li>To design and develop a full-stack food ordering web application using the MERN technology stack.</li>
+    <li>To integrate an AI-powered recommendation engine using the Groq API (LLaMA 3.1 model) for personalised, context-aware dish suggestions.</li>
+    <li>To implement a secure, JWT-based authentication and authorisation system with role-based access control (User / Admin).</li>
+    <li>To build a comprehensive Admin Dashboard for real-time management of menus, orders, users, delivery personnel, and revenue analytics.</li>
+    <li>To deliver a premium, responsive, and accessible UI using Tailwind CSS and Framer Motion micro-animations.</li>
+    <li>To integrate the Razorpay payment gateway for secure, multi-mode payment processing.</li>
+    <li>To deploy the entire application on Vercel using a serverless function architecture optimised for low-latency global delivery.</li>
+  </ul>
+
+  <div class="pg-num">1</div>
+</div>
+
+<!-- Chapter 1 continued – Page 2 -->
+<div class="page">
+  <h2>1.4 Problem Statement</h2>
+  <p>The food service and hospitality industry faces a critical challenge in the digital age: delivering a personalised, engaging, and efficient ordering experience to a diverse and discerning user base. Existing food ordering platforms, while functionally adequate, exhibit several systemic limitations:</p>
+  <ol>
+    <li><strong>Static Menu Presentation:</strong> Menus are displayed as undifferentiated lists with no contextual filtering based on user preference, mood, or available budget.</li>
+    <li><strong>Absence of Personalisation:</strong> No real-time mechanism exists to adapt recommendations based on individual user behaviour or natural language intent.</li>
+    <li><strong>Poor UX/UI Design:</strong> Many food ordering systems rely on outdated design patterns, resulting in poor user engagement and high bounce rates.</li>
+    <li><strong>Fragmented Admin Operations:</strong> Restaurant owners and food court managers lack a unified command centre to monitor orders, track deliveries, manage inventory, and analyse revenue simultaneously.</li>
+    <li><strong>Limited Order Transparency:</strong> Customers cannot track their order lifecycle in real time, leading to dissatisfaction and repeated support queries.</li>
+  </ol>
+  <p>FoodGenie is designed as a comprehensive solution to all of the above limitations.</p>
+
+  <h2>1.5 Scope of the Project</h2>
+  <p>The scope of FoodGenie encompasses the following functional domains:</p>
+  <ul>
+    <li><strong>Customer-Facing Portal:</strong> Home page, menu browsing, AI recommendations, cart management, secure checkout, real-time order tracking, user profile, and order history.</li>
+    <li><strong>AI Concierge Module:</strong> A conversational chatbot powered by the Groq LLaMA 3.1 API, accepting natural language input and returning contextualised menu recommendations.</li>
+    <li><strong>Admin Command Centre:</strong> Full management of food items, categories, orders, users, delivery boys, revenue analytics, customer reviews, and system settings.</li>
+    <li><strong>Payment Integration:</strong> Razorpay gateway for cards, UPI, net banking, and wallets.</li>
+    <li><strong>Deployment &amp; DevOps:</strong> Continuous deployment via Vercel with environment variable management and serverless function architecture.</li>
+  </ul>
+
+  <h2>1.6 System Architecture Overview</h2>
+  <p>FoodGenie follows a three-tier client–server architecture deployed on cloud-native serverless infrastructure:</p>
+
+  <div class="flow">
+    <div class="flow-box"><strong>Tier 1 – Client</strong><br/>React.js + Tailwind CSS + Framer Motion<br/>(Browser / Vite build)</div>
+    <span class="flow-arr">↕ HTTP REST API (Axios)</span>
+    <div class="flow-box"><strong>Tier 2 – Application Server</strong><br/>Node.js + Express.js<br/>(Vercel Serverless Functions)</div>
+    <span class="flow-arr">↕ Mongoose ODM / TLS</span>
+    <div class="flow-box"><strong>Tier 3 – Database</strong><br/>MongoDB Atlas<br/>(Cloud NoSQL)</div>
+  </div>
+
+  <p style="margin-top:8pt;">External integrations: <strong>Groq API</strong> (AI inference), <strong>Pexels API</strong> (dynamic food imagery), <strong>Razorpay SDK</strong> (payments).</p>
+
+  <div class="pg-num">2</div>
+</div>
+
+<!-- Chapter 1 – Page 3 -->
+<div class="page">
+  <h2>1.7 Report Organisation</h2>
+  <p>This report is organised into six chapters, each covering a distinct aspect of the project lifecycle, as shown in Table 1.1 below.</p>
+
+  <p class="tbl-caption">Table 1.1: Chapter-wise Organisation of the Report</p>
+  <table class="dt">
+    <tr><th>Chapter No.</th><th>Title</th><th>Content Summary</th></tr>
+    <tr><td>1</td><td>Introduction</td><td>Background, objectives, problem statement, scope, architecture, and report layout.</td></tr>
+    <tr><td>2</td><td>System Analysis</td><td>Feasibility study, existing system review, use-case description, and data flow diagram.</td></tr>
+    <tr><td>3</td><td>Software Requirement Specifications</td><td>Functional and non-functional requirements, system constraints, and interface requirements.</td></tr>
+    <tr><td>4</td><td>Technology Used</td><td>Detailed discussion of all technologies, frameworks, libraries, APIs, and tools employed.</td></tr>
+    <tr><td>5</td><td>Coding and Screen Shots</td><td>Key source code segments with inline comments and annotated application screenshots.</td></tr>
+    <tr><td>6</td><td>Conclusions / Findings / Future Scope</td><td>Project findings, conclusions, limitations identified, and proposed future enhancements.</td></tr>
+  </table>
+
+  <h2>1.8 Project Limitations</h2>
+  <ul>
+    <li>Real-time order status updates rely on client-side polling rather than WebSockets, due to constraints of the serverless deployment environment.</li>
+    <li>The Groq free-tier API is subject to request-per-minute rate limits, which must be handled gracefully on the frontend.</li>
+    <li>Image sourcing via the Pexels API is search-term-based and may occasionally return images that are not perfectly dish-specific.</li>
+    <li>The current version does not include a native mobile application, though the web application is fully mobile-responsive.</li>
+  </ul>
+
+  <div class="pg-num">3</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CHAPTER 2 – SYSTEM ANALYSIS   Page 5
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="ch-heading">
+    <div class="ch-label">Chapter 2</div>
+    <div class="ch-title">System Analysis</div>
+  </div>
+
+  <h2>2.1 Feasibility Study</h2>
+
+  <h3>2.1.1 Technical Feasibility</h3>
+  <p>All technologies employed in FoodGenie are mature, open-source, and extensively documented. The MERN stack is one of the most widely adopted full-stack combinations in the software industry, supported by a vast ecosystem of packages, tutorials, and community contributions. The Groq API provides free-tier access to LLaMA 3.1 inference with sub-second response latency, making real-time AI integration technically viable for academic projects. Vercel offers a generous Hobby-tier deployment plan that supports full-stack applications at zero cost.</p>
+
+  <h3>2.1.2 Economic Feasibility</h3>
+  <p>The entire project has been developed using free-tier and open-source resources. The estimated monthly operational cost is presented in Table 2.1.</p>
+
+  <p class="tbl-caption">Table 2.1: Monthly Cost Breakdown of Project Resources</p>
+  <table class="dt">
+    <tr><th>Resource / Service</th><th>Plan Used</th><th>Monthly Cost</th></tr>
+    <tr><td>MongoDB Atlas</td><td>M0 Free Shared Cluster</td><td>₹ 0</td></tr>
+    <tr><td>Vercel Hosting</td><td>Hobby (Free) Tier</td><td>₹ 0</td></tr>
+    <tr><td>Groq API (LLM Inference)</td><td>Free Tier (Rate-limited)</td><td>₹ 0</td></tr>
+    <tr><td>Pexels API (Images)</td><td>Free Tier</td><td>₹ 0</td></tr>
+    <tr><td>Development Tools (VS Code, Git)</td><td>Open Source</td><td>₹ 0</td></tr>
+    <tr><td><strong>Total</strong></td><td>—</td><td><strong>₹ 0</strong></td></tr>
+  </table>
+
+  <h3>2.1.3 Operational Feasibility</h3>
+  <p>The customer portal requires no technical knowledge to operate; users can register, browse, order, and track their meals intuitively. The admin dashboard is designed to be operated by restaurant managers with basic computer literacy. Database seeding scripts (<code>seed.js</code>) simplify initial data population, and the provided <code>.env.example</code> files ease onboarding of new developers.</p>
+
+  <h2>2.2 Existing System Analysis</h2>
+  <p>A comparative analysis of leading food ordering platforms reveals the shortcomings that FoodGenie directly addresses, as presented in Table 2.2.</p>
+
+  <p class="tbl-caption">Table 2.2: Comparative Analysis – Existing Systems vs. FoodGenie</p>
+  <table class="dt">
+    <tr><th>Feature</th><th>Swiggy / Zomato</th><th>FoodGenie</th></tr>
+    <tr><td>AI / LLM Personalised Recommendations</td><td>Algorithm-based, no LLM</td><td>Real-time LLM (Groq LLaMA 3.1)</td></tr>
+    <tr><td>Natural Language Ordering ("Genie")</td><td>Not available</td><td>Fully conversational AI chatbot</td></tr>
+    <tr><td>UI Design Language</td><td>Standard Material Design</td><td>Premium Glassmorphism + Framer Motion</td></tr>
+    <tr><td>Build-Your-Plate Feature</td><td>Not available</td><td>Available with custom component selection</td></tr>
+    <tr><td>User Gamification (XP / Ranks)</td><td>Limited loyalty points</td><td>Full XP + rank progression system</td></tr>
+    <tr><td>Real-Time Order Tracking (Animated)</td><td>Basic map view</td><td>Animated cinematic timeline</td></tr>
+    <tr><td>Source Code Availability</td><td>Proprietary</td><td>Open source (ISC Licence)</td></tr>
+  </table>
+
+  <div class="pg-num">5</div>
+</div>
+
+<!-- Chapter 2 – Page 6 -->
+<div class="page">
+  <h2>2.3 Use Case Description</h2>
+
+  <h3>Primary Actors</h3>
+  <ul>
+    <li><strong>Customer:</strong> Registers, logs in, browses the menu, interacts with the AI Genie, manages cart, places and pays for orders, tracks delivery, views order history, and manages profile.</li>
+    <li><strong>Admin:</strong> Logs into the admin dashboard, manages food items, categories, users, orders, delivery boys, views analytics, and configures system settings.</li>
+    <li><strong>Delivery Boy:</strong> Assigned to orders by the Admin; updates delivery progress.</li>
+    <li><strong>Groq API (External):</strong> Processes natural language food queries and returns AI-generated dish recommendations.</li>
+    <li><strong>Razorpay (External):</strong> Processes secure payment transactions during the checkout flow.</li>
+  </ul>
+
+  <p class="tbl-caption">Table 2.3: Key Use Cases of the FoodGenie System</p>
+  <table class="dt">
+    <tr><th>Use Case</th><th>Primary Actor</th><th>Brief Description</th></tr>
+    <tr><td>Register / Login</td><td>Customer, Admin</td><td>Secure account creation and JWT-based authentication.</td></tr>
+    <tr><td>Browse &amp; Filter Menu</td><td>Customer</td><td>Filter food items by category, price, and availability.</td></tr>
+    <tr><td>AI Genie Recommendation</td><td>Customer, Groq API</td><td>Natural language conversational food recommendations from live menu.</td></tr>
+    <tr><td>Build Your Plate</td><td>Customer</td><td>Compose a custom meal from categorised plate component items.</td></tr>
+    <tr><td>Add to Cart &amp; Checkout</td><td>Customer, Razorpay</td><td>Cart management and payment gateway integration.</td></tr>
+    <tr><td>Track Order</td><td>Customer</td><td>Animated real-time status: Pending → Preparing → Out for Delivery → Delivered.</td></tr>
+    <tr><td>Manage Menu / Categories</td><td>Admin</td><td>Create, Read, Update, Delete food items and categories.</td></tr>
+    <tr><td>Manage Orders</td><td>Admin</td><td>Update order status and assign delivery boys to active orders.</td></tr>
+    <tr><td>View Revenue Analytics</td><td>Admin</td><td>Revenue charts, top-selling items, and user behaviour insights.</td></tr>
+  </table>
+
+  <h2>2.4 Data Flow Diagram (DFD)</h2>
+
+  <h3>Level 0 – Context Diagram</h3>
+  <div class="flow" style="flex-wrap:wrap; display:flex; justify-content:center; align-items:center; gap:8pt;">
+    <div class="flow-box">Customer</div>
+    <span style="font-size:18pt;">⇄</span>
+    <div class="flow-box" style="border-width:2px;"><strong>FoodGenie<br/>System</strong></div>
+    <span style="font-size:18pt;">⇄</span>
+    <div class="flow-box">Admin</div>
+  </div>
+  <div class="flow" style="flex-wrap:wrap; display:flex; justify-content:center; align-items:center; gap:8pt; margin-top:6pt;">
+    <div class="flow-box">Groq API</div>
+    <span style="font-size:18pt;">⇄</span>
+    <div class="flow-box" style="border-width:2px;"><strong>FoodGenie<br/>System</strong></div>
+    <span style="font-size:18pt;">⇄</span>
+    <div class="flow-box">Razorpay</div>
+  </div>
+
+  <h3>Level 1 – Major Internal Processes</h3>
+  <ol>
+    <li><strong>User Authentication Process:</strong> Accepts login credentials → validates against User collection in MongoDB → issues signed JWT token → returns to client.</li>
+    <li><strong>Menu Management Process:</strong> Admin performs CRUD operations via dashboard → updates FoodItem collection → Customer retrieves live, filtered menu on request.</li>
+    <li><strong>AI Recommendation Process:</strong> Customer submits natural language prompt → System fetches complete menu context from DB → Forwards context + prompt to Groq LLaMA 3.1 → Returns recommendation response to client.</li>
+    <li><strong>Order Lifecycle Process:</strong> Customer places order → Razorpay processes payment → Order document created in DB (status: Pending) → Admin updates status via dashboard → Customer polls for status and tracks in animated UI.</li>
+  </ol>
+
+  <div class="pg-num">6</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CHAPTER 3 – SRS   Page 9
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="ch-heading">
+    <div class="ch-label">Chapter 3</div>
+    <div class="ch-title">Software Requirement Specifications</div>
+  </div>
+
+  <h2>3.1 Introduction</h2>
+  <p>This chapter presents the Software Requirement Specification (SRS) document for the FoodGenie platform. It systematically defines all functional requirements (what the system shall do), non-functional requirements (how well the system shall perform), interface requirements, and system constraints that guided the design, development, and testing of the application.</p>
+
+  <h2>3.2 Functional Requirements</h2>
+
+  <h3>3.2.1 User Authentication &amp; Profile Management</h3>
+  <ul>
+    <li><strong>FR-01:</strong> The system shall allow new users to register using full name, email address, and password.</li>
+    <li><strong>FR-02:</strong> The system shall authenticate registered users using email and password, returning a signed JSON Web Token (JWT) valid for a configurable duration (default: 30 days).</li>
+    <li><strong>FR-03:</strong> The system shall enforce role-based access control with two distinct roles: <em>user</em> (Customer) and <em>admin</em> (Administrator).</li>
+    <li><strong>FR-04:</strong> Authenticated users shall be able to update their profile including display name, avatar image URL, and taste mood preference (Adventurous, Comfort, Healthy, Energetic).</li>
+    <li><strong>FR-05:</strong> The system shall maintain and display a gamification profile comprising XP points, rank (Rookie → Explorer → Foodie → Gourmet → Legend), and count of completed orders.</li>
+  </ul>
+
+  <h3>3.2.2 Menu &amp; Food Discovery</h3>
+  <ul>
+    <li><strong>FR-06:</strong> The system shall retrieve and display all available food items from the database, including name, price, category, description, average rating, review count, and a dynamically sourced Pexels image.</li>
+    <li><strong>FR-07:</strong> Customers shall be able to filter food items by category using interactive category tabs.</li>
+    <li><strong>FR-08:</strong> Administrators shall be able to Create, Read, Update, and Delete (CRUD) food items and food categories via the admin dashboard.</li>
+    <li><strong>FR-09:</strong> The system shall provide a "Build Your Plate" feature that allows customers to compose a custom meal by selecting items from predefined plate-component categories (e.g., Base, Protein, Side, Drink).</li>
+  </ul>
+
+  <h3>3.2.3 AI Recommendation Engine</h3>
+  <ul>
+    <li><strong>FR-10:</strong> The system shall provide a persistent conversational AI chatbot ("Genie") accessible from all customer-facing pages via a floating action button.</li>
+    <li><strong>FR-11:</strong> The Genie chatbot shall accept free-form natural language input (e.g., "I want something spicy under ₹200") and respond with personalised recommendations drawn from the live menu.</li>
+    <li><strong>FR-12:</strong> The Genie shall use the Groq LLaMA 3.1-8B-Instant model with the complete current menu dynamically injected as the system context for every request.</li>
+    <li><strong>FR-13:</strong> The system shall additionally provide a dedicated structured "Recommend" page where users can input budget, mood, and dietary preferences to receive AI-generated dish suggestions.</li>
+  </ul>
+
+  <div class="pg-num">9</div>
+</div>
+
+<!-- Chapter 3 – Page 10 -->
+<div class="page">
+  <h3>3.2.4 Cart &amp; Checkout</h3>
+  <ul>
+    <li><strong>FR-14:</strong> Customers shall be able to add, remove, and adjust quantities of items in the shopping cart; cart state shall persist across sessions using the browser's local storage.</li>
+    <li><strong>FR-15:</strong> The cart page shall display real-time stock availability status for each item and prevent checkout if unavailable items are present.</li>
+    <li><strong>FR-16:</strong> The checkout form shall collect delivery address details (street, city, phone number) and the selected payment method.</li>
+    <li><strong>FR-17:</strong> The system shall integrate the Razorpay payment gateway to support Cards, UPI, Net Banking, and Wallet payment modes.</li>
+    <li><strong>FR-18:</strong> Upon successful payment confirmation from Razorpay, the system shall create an Order document in MongoDB with status "Pending" and paymentStatus "Paid," and clear the cart.</li>
+  </ul>
+
+  <h3>3.2.5 Order Tracking</h3>
+  <ul>
+    <li><strong>FR-19:</strong> Authenticated customers shall be able to view a real-time order tracking page with animated status step indicators for each of their active orders.</li>
+    <li><strong>FR-20:</strong> Order status shall progress sequentially through the states: Pending → Preparing → Out for Delivery → Delivered (or Cancelled).</li>
+    <li><strong>FR-21:</strong> Upon order delivery, customers shall be prompted to submit a rating (1–5 stars) for the restaurant and the delivery boy, along with optional text feedback.</li>
+  </ul>
+
+  <h3>3.2.6 Admin Dashboard</h3>
+  <ul>
+    <li><strong>FR-22:</strong> The admin dashboard home page shall display real-time aggregate KPI cards: Total Revenue, Total Orders, Active Users, and Pending Orders.</li>
+    <li><strong>FR-23:</strong> Admins shall be able to perform full CRUD operations on food items, food categories, and delivery boy records.</li>
+    <li><strong>FR-24:</strong> Admins shall be able to view all orders, update their status, and assign or reassign delivery boys to any active order.</li>
+    <li><strong>FR-25:</strong> The analytics section shall display revenue trend charts over configurable time periods and a ranked list of top-selling food items.</li>
+  </ul>
+
+  <h2>3.3 Non-Functional Requirements</h2>
+  <p class="tbl-caption">Table 3.1: Non-Functional Requirements of FoodGenie</p>
+  <table class="dt">
+    <tr><th>ID</th><th>Category</th><th>Requirement</th></tr>
+    <tr><td>NFR-01</td><td>Performance</td><td>All API responses (excluding AI inference) shall complete within 2 seconds under normal load.</td></tr>
+    <tr><td>NFR-02</td><td>Security</td><td>Passwords shall be hashed with bcryptjs (salt factor 10). JWT tokens shall be validated on every protected API route.</td></tr>
+    <tr><td>NFR-03</td><td>Availability</td><td>The system shall maintain ≥ 99% uptime using Vercel's global CDN and auto-scaling serverless functions.</td></tr>
+    <tr><td>NFR-04</td><td>Scalability</td><td>The serverless backend shall automatically scale with request volume without manual intervention.</td></tr>
+    <tr><td>NFR-05</td><td>Usability</td><td>The UI shall be fully responsive across desktop (≥1024px), tablet (768–1023px), and mobile (&lt;768px) viewports.</td></tr>
+    <tr><td>NFR-06</td><td>Maintainability</td><td>Backend shall follow MVC architecture; frontend shall use a feature-based folder structure for easy onboarding.</td></tr>
+    <tr><td>NFR-07</td><td>Portability</td><td>The application shall function correctly on Chrome, Firefox, Safari, and Microsoft Edge (latest 2 versions).</td></tr>
+  </table>
+
+  <div class="pg-num">10</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CHAPTER 4 – TECHNOLOGY USED   Page 14
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="ch-heading">
+    <div class="ch-label">Chapter 4</div>
+    <div class="ch-title">Technology Used</div>
+  </div>
+
+  <h2>4.1 Frontend Technologies</h2>
+
+  <h3>4.1.1 React.js (v18)</h3>
+  <p>React.js is an open-source JavaScript library developed by Meta for building component-based user interfaces. FoodGenie utilises React's Virtual DOM for efficient declarative re-rendering, React Hooks (useState, useEffect, useContext, useCallback) for state and side-effect management, and React Router v6 for client-side navigation including nested protected routes for the admin panel.</p>
+
+  <h3>4.1.2 Tailwind CSS (v3)</h3>
+  <p>Tailwind CSS is a utility-first CSS framework that enables rapid, consistent UI development through composable class names. FoodGenie extends the default Tailwind configuration via <code>tailwind.config.js</code> to define a custom design token system — including the glassmorphism dark colour palette (dark-900, dark-800, etc.) and primary accent colours — ensuring visual consistency throughout the application.</p>
+
+  <h3>4.1.3 Framer Motion</h3>
+  <p>Framer Motion is a production-grade React animation library. It powers all page transitions, hover micro-interactions, skeleton loading screen animations, and the cinematic animated order-status timeline in FoodGenie. The <code>AnimatePresence</code> component enables smooth enter/exit animations when routes are mounted or unmounted.</p>
+
+  <h3>4.1.4 Zustand</h3>
+  <p>Zustand is a lightweight, unopinionated global state management library for React applications. FoodGenie uses the <code>useAuthStore</code> Zustand store to manage authentication state (user object and JWT token) globally, persisted to <code>localStorage</code>, without the boilerplate overhead of Redux or Context API.</p>
+
+  <h3>4.1.5 Axios</h3>
+  <p>Axios is a promise-based HTTP client for the browser and Node.js. All API calls from the frontend to the backend are channelled through a centralised Axios instance configured in <code>/src/api/</code>, which automatically injects the JWT Authorization header via a request interceptor, reducing repetitive code across components.</p>
+
+  <h3>4.1.6 Vite</h3>
+  <p>Vite is a next-generation frontend build tool offering near-instantaneous Hot Module Replacement (HMR) during development, powered by native ES modules. Production builds are optimised through Rollup with automatic code splitting, tree shaking, and asset hashing for optimal caching.</p>
+
+  <div class="pg-num">14</div>
+</div>
+
+<!-- Chapter 4 – Page 15 -->
+<div class="page">
+  <h2>4.2 Backend Technologies</h2>
+
+  <h3>4.2.1 Node.js (v18+)</h3>
+  <p>Node.js is an open-source, cross-platform JavaScript runtime built on Google Chrome's V8 engine. Its non-blocking, event-driven I/O model makes it ideal for building scalable, concurrent network applications. FoodGenie's entire backend is authored in Node.js, enabling a unified JavaScript codebase across both frontend and backend tiers of the stack.</p>
+
+  <h3>4.2.2 Express.js (v4)</h3>
+  <p>Express.js is a minimal and unopinionated web application framework for Node.js. FoodGenie's backend uses Express to define a RESTful API with ten route modules, apply CORS and Morgan middleware, parse JSON request bodies up to 10 MB, and export the Express <code>app</code> instance as a Vercel Serverless Function handler.</p>
+
+  <h3>4.2.3 MongoDB &amp; Mongoose</h3>
+  <p>MongoDB is a document-oriented NoSQL database that stores data in flexible, JSON-like BSON documents, allowing schema evolution without migrations. Mongoose is the Object Data Modelling (ODM) library providing schema definition, type casting, validation, middleware hooks (pre/post save), and query helper methods. FoodGenie defines six Mongoose models, described in Table 4.1.</p>
+
+  <p class="tbl-caption">Table 4.1: Mongoose Data Models in FoodGenie</p>
+  <table class="dt">
+    <tr><th>Model</th><th>Collection</th><th>Key Fields</th></tr>
+    <tr><td>User</td><td>users</td><td>name, email, password (bcrypt hashed), role, tasteMood, xp, rank, ordersCompleted</td></tr>
+    <tr><td>FoodItem</td><td>fooditems</td><td>name, price, category, image, description, isAvailable, rating, numReviews, isPlateComponent</td></tr>
+    <tr><td>Order</td><td>orders</td><td>user (ref), customId, items[], totalAmount, shippingAddress, status, deliveryBoy (ref), paymentStatus, ratings</td></tr>
+    <tr><td>Category</td><td>categories</td><td>name</td></tr>
+    <tr><td>DeliveryBoy</td><td>deliveryboys</td><td>name, phone, vehicle, isAvailable, currentOrder (ref)</td></tr>
+    <tr><td>Notification</td><td>notifications</td><td>user (ref), message, type, isRead, createdAt</td></tr>
+  </table>
+
+  <h2>4.3 AI &amp; External API Integrations</h2>
+
+  <h3>4.3.1 Groq API – LLaMA 3.1-8B-Instant Model</h3>
+  <p>Groq Inc. provides ultra-low-latency LLM inference through its proprietary Language Processing Unit (LPU) architecture, which delivers throughput significantly faster than GPU-based alternatives. FoodGenie's <code>/api/chat</code> route fetches the entire live menu from MongoDB, formats it as a system context string, and forwards the user's natural language prompt to the <code>llama-3.1-8b-instant</code> model using the Groq OpenAI-compatible REST endpoint. Typical end-to-end latency is under 800 ms.</p>
+
+  <h3>4.3.2 Pexels API</h3>
+  <p>The Pexels API provides programmatic access to a curated library of over 3.2 million free, high-resolution stock photographs. FoodGenie queries images dynamically by food item name, ensuring visually rich menu cards without the storage overhead of self-hosted images.</p>
+
+  <h3>4.3.3 Razorpay Payment Gateway</h3>
+  <p>Razorpay is India's leading payment gateway, supporting Cards, UPI, Net Banking, and Digital Wallets. FoodGenie integrates Razorpay's Node.js Server SDK to create server-side payment orders, and its client-side JavaScript checkout SDK to render the payment modal in the browser during the checkout flow.</p>
+
+  <div class="pg-num">15</div>
+</div>
+
+<!-- Chapter 4 – Page 16 -->
+<div class="page">
+  <h2>4.4 DevOps &amp; Deployment Infrastructure</h2>
+
+  <h3>4.4.1 Vercel – Serverless Platform</h3>
+  <p>Vercel is a cloud platform specialising in frontend hosting and serverless function execution. FoodGenie's deployment uses Vercel's <strong>Serverless Functions</strong> feature for the Node.js/Express backend (exported via <code>api/index.js</code>) and a pre-built Vite static bundle for the frontend, all served from a single Vercel project. URL rewriting rules defined in <code>vercel.json</code> route all <code>/api/*</code> requests to the serverless function, while all other requests are served from the static frontend build.</p>
+
+  <h3>4.4.2 MongoDB Atlas</h3>
+  <p>MongoDB Atlas is a fully managed cloud database service hosted on AWS/GCP/Azure. FoodGenie connects to an Atlas M0 (free tier) cluster over TLS. A global-variable–based connection caching pattern (<code>global.mongoose</code>) is implemented in <code>db.js</code> to reuse active connections across Vercel serverless function cold starts, preventing the creation of excessive database connections under concurrent load.</p>
+
+  <h2>4.5 Development Tools</h2>
+  <p class="tbl-caption">Table 4.2: Development Tools and Utilities Used</p>
+  <table class="dt">
+    <tr><th>Tool</th><th>Purpose</th><th>Version</th></tr>
+    <tr><td>Visual Studio Code</td><td>Primary code editor (with ESLint, Prettier extensions)</td><td>Latest</td></tr>
+    <tr><td>Git / GitHub</td><td>Version control and remote code repository</td><td>2.x</td></tr>
+    <tr><td>Postman</td><td>REST API testing and endpoint documentation</td><td>Latest</td></tr>
+    <tr><td>MongoDB Compass</td><td>Visual GUI for inspecting and querying MongoDB Atlas</td><td>Latest</td></tr>
+    <tr><td>Node Package Manager (npm)</td><td>Dependency management for frontend and backend</td><td>10.x</td></tr>
+    <tr><td>concurrently</td><td>Run frontend and backend dev servers simultaneously</td><td>^9.2.1</td></tr>
+    <tr><td>dotenv</td><td>Load environment variables from .env files into process.env</td><td>^16.x</td></tr>
+    <tr><td>bcryptjs</td><td>Password hashing library (salt factor 10)</td><td>^2.x</td></tr>
+    <tr><td>jsonwebtoken (JWT)</td><td>Signing and verifying JSON Web Tokens for authentication</td><td>^9.x</td></tr>
+    <tr><td>morgan</td><td>HTTP request logger middleware for Express (dev mode)</td><td>^1.x</td></tr>
+  </table>
+
+  <div class="pg-num">16</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CHAPTER 5 – CODING AND SCREEN SHOTS   Page 19
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="ch-heading">
+    <div class="ch-label">Chapter 5</div>
+    <div class="ch-title">Coding and Screen Shots</div>
+  </div>
+
+  <h2>5.1 Project Folder Structure</h2>
+  <p>FoodGenie follows a monorepo structure with clear separation between the frontend, backend, and deployment configuration:</p>
+<pre>food-court/
+├── api/
+│   └── index.js              ← Vercel serverless function entry point
+├── backend/
+│   ├── server.js             ← Express app configuration and route registration
+│   ├── seed.js               ← Database seeding script (food items and admin)
+│   ├── seedAdmin.js          ← Admin user seeding script
+│   └── src/
+│       ├── config/
+│       │   └── db.js         ← MongoDB Atlas connection with caching
+│       ├── controllers/      ← Business logic handlers
+│       ├── middleware/        ← JWT authentication middleware
+│       ├── models/           ← Mongoose schemas (User, FoodItem, Order, …)
+│       ├── routes/           ← Express route definitions (10 route modules)
+│       └── services/         ← External API service wrappers
+├── frontend/
+│   ├── src/
+│   │   ├── admin/            ← Admin dashboard pages and layout
+│   │   ├── components/       ← Reusable UI components (Navbar, ChatBot, …)
+│   │   ├── context/          ← React Context providers (Food, Theme)
+│   │   ├── pages/            ← 12 customer-facing page components
+│   │   ├── store/            ← Zustand global state stores
+│   │   ├── api/              ← Centralised Axios instance and API helpers
+│   │   ├── App.jsx           ← Root component with React Router v6 setup
+│   │   └── main.jsx          ← ReactDOM application entry point
+│   └── vite.config.js        ← Vite build configuration
+├── vercel.json               ← Vercel deployment and URL rewrite rules
+└── package.json              ← Root-level scripts (dev, build, seed, install:all)</pre>
+
+  <div class="pg-num">19</div>
+</div>
+
+<!-- Chapter 5 – Page 20 -->
+<div class="page">
+  <h2>5.2 Key Source Code Segments</h2>
+
+  <h3>5.2.1 Database Connection with Serverless Caching (backend/src/config/db.js)</h3>
+  <p>This module implements a global-variable connection caching pattern to prevent connection pool exhaustion across repeated Vercel serverless function invocations:</p>
+<pre>const mongoose = require('mongoose');
+
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+const connectDB = async () => {
+  if (cached.conn) {
+    console.log('✅ Reusing existing MongoDB connection');
+    return cached.conn;
+  }
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGODB_URI, {
+      bufferCommands: false,
+    }).then((mongoose) => {
+      console.log(`✅ MongoDB Connected: ${mongoose.connection.host}`);
+      return mongoose;
+    });
+  }
+  cached.conn = await cached.promise;
+  return cached.conn;
+};
+
+module.exports = connectDB;</pre>
+
+  <h3>5.2.2 Express Server and Route Registration (backend/server.js)</h3>
+<pre>require('dotenv').config();
+const express   = require('express');
+const cors      = require('cors');
+const morgan    = require('morgan');
+const connectDB = require('./src/config/db');
+
+const app = express();
+connectDB();
+
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(morgan('dev'));
+
+// API Route Registration
+app.use('/api/menu',          require('./src/routes/menu.routes.js'));
+app.use('/api/auth',          require('./src/routes/auth.routes.js'));
+app.use('/api/orders',        require('./src/routes/order.routes.js'));
+app.use('/api/users',         require('./src/routes/user.routes.js'));
+app.use('/api/categories',    require('./src/routes/category.routes.js'));
+app.use('/api/notifications', require('./src/routes/notification.routes.js'));
+app.use('/api/chat',          require('./src/routes/chat.js'));
+app.use('/api/dashboard',     require('./src/routes/dashboard.routes.js'));
+app.use('/api/delivery-boys', require('./src/routes/deliveryBoy.routes.js'));
+app.use('/api/payments',      require('./src/routes/payment.routes.js'));
+
+// Health Check Endpoint
+app.get('/api/health', (req, res) => {
+  const mongoose = require('mongoose');
+  res.json({
+    status: 'online',
+    uptime: process.uptime(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
+module.exports = app; // Export for Vercel Serverless</pre>
+
+  <div class="pg-num">20</div>
+</div>
+
+<!-- Chapter 5 – Page 21 -->
+<div class="page">
+  <h3>5.2.3 AI Genie Chat Route (backend/src/routes/chat.js)</h3>
+  <p>The chat route fetches the live menu, constructs a system context string, and forwards the user prompt to the Groq API:</p>
+<pre>const express  = require('express');
+const router   = express.Router();
+const FoodItem = require('../models/FoodItem');
+const axios    = require('axios');
+
+// POST /api/chat – Process AI food recommendation queries
+router.post('/', async (req, res) => {
+  const { prompt } = req.body;
+  if (!prompt) return res.status(400).json({ message: "Provide a prompt" });
+
+  try {
+    // 1. Fetch live menu context from MongoDB
+    const allItems   = await FoodItem.find({ isAvailable: true });
+    const menuContext = allItems
+      .map(item => `- ${item.name} (${item.category}): ₹${item.price}`)
+      .join('\n');
+
+    // 2. Call Groq API with menu context + user prompt
+    const response = await axios.post(
+      'https://api.groq.com/openai/v1/chat/completions',
+      {
+        model: "llama-3.1-8b-instant",
+        messages: [
+          { role: "system",
+            content: `You are FoodGenie AI, a friendly food advisor.
+Current Menu:\n${menuContext}\nRecommend from this menu only.` },
+          { role: "user", content: prompt }
+        ]
+      },
+      { headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` } }
+    );
+
+    const answer = response.data.choices[0].message.content;
+    res.json({ answer });
+
+  } catch (error) {
+    console.error('Groq Error:', error.response?.data || error.message);
+    res.status(500).json({ message: "Genie is taking a nap. Try again! 🧞" });
+  }
+});
+
+module.exports = router;</pre>
+
+  <div class="pg-num">21</div>
+</div>
+
+<!-- Chapter 5 – Page 22 -->
+<div class="page">
+  <h3>5.2.4 User Mongoose Model with Pre-Save Password Hashing (backend/src/models/User.js)</h3>
+<pre>const mongoose = require('mongoose');
+const bcrypt   = require('bcryptjs');
+
+const userSchema = new mongoose.Schema({
+  name:            { type: String, required: true },
+  email:           { type: String, required: true, unique: true },
+  password:        { type: String, required: true },
+  role:            { type: String, enum: ['user', 'admin'], default: 'user' },
+  avatar:          { type: String, default: '' },
+  tasteMood:       { type: String, default: 'adventurous' },
+  rank:            { type: String, default: 'Rookie' },
+  xp:              { type: Number, default: 0 },
+  ordersCompleted: { type: Number, default: 0 },
+  favoritesCount:  { type: Number, default: 0 },
+  createdAt:       { type: Date,   default: Date.now }
+});
+
+// Pre-save hook: hash password before first save or on modification
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+module.exports = mongoose.model('User', userSchema);</pre>
+
+  <h3>5.2.5 Order Model with Auto-Generated Human-Readable ID (backend/src/models/Order.js)</h3>
+<pre>const mongoose = require('mongoose');
+
+const orderSchema = new mongoose.Schema({
+  user:            { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  customId:        { type: String, unique: true },
+  items: [{
+    foodItem:      { type: mongoose.Schema.Types.ObjectId, ref: 'FoodItem' },
+    name:          { type: String, required: true },
+    quantity:      { type: Number, required: true },
+    price:         { type: Number, required: true }
+  }],
+  totalAmount:     { type: Number, required: true },
+  shippingAddress: {
+    street: { type: String, required: true },
+    city:   { type: String, required: true },
+    phone:  { type: String, required: true }
+  },
+  status: {
+    type: String,
+    enum: ['Pending','Preparing','Out for Delivery','Delivered','Cancelled'],
+    default: 'Pending'
+  },
+  deliveryBoy:   { type: mongoose.Schema.Types.ObjectId, ref: 'DeliveryBoy' },
+  paymentStatus: { type: String, enum: ['Paid','Unpaid'], default: 'Unpaid' },
+  ratings:       { restaurant: Number, delivery: Number, feedback: String }
+}, { timestamps: true });
+
+// Pre-save: generate readable order ID like GENIE-AB12CD
+orderSchema.pre('save', function(next) {
+  if (!this.customId)
+    this.customId = 'GENIE-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  next();
+});
+
+module.exports = mongoose.model('Order', orderSchema);</pre>
+
+  <div class="pg-num">22</div>
+</div>
+
+<!-- Chapter 5 – Page 23 (Screenshots table) -->
+<div class="page">
+  <h3>5.2.6 React Application Routing (frontend/src/App.jsx) – Excerpt</h3>
+<pre>function App() {
+  return (
+    &lt;Router future={{ v7_startTransition: true }}&gt;
+      &lt;ThemeProvider&gt;
+        &lt;FoodProvider&gt;
+          &lt;AppContent /&gt;
+        &lt;/FoodProvider&gt;
+      &lt;/ThemeProvider&gt;
+    &lt;/Router&gt;
+  );
+}
+
+// Protected Admin routes (role = 'admin' required)
+&lt;Route element={&lt;ProtectedRoute adminOnly={true} /&gt;}&gt;
+  &lt;Route path="/admin" element={&lt;AdminLayout /&gt;}&gt;
+    &lt;Route index        element={&lt;AdminDashboard /&gt;} /&gt;
+    &lt;Route path="menu"      element={&lt;ManageMenu /&gt;} /&gt;
+    &lt;Route path="orders"    element={&lt;ManageOrders /&gt;} /&gt;
+    &lt;Route path="orders/:id" element={&lt;OrderDetails /&gt;} /&gt;
+    &lt;Route path="users"     element={&lt;ManageUsers /&gt;} /&gt;
+    &lt;Route path="analytics" element={&lt;Analytics /&gt;} /&gt;
+    &lt;Route path="revenue"   element={&lt;Revenue /&gt;} /&gt;
+  &lt;/Route&gt;
+&lt;/Route&gt;</pre>
+
+  <h3>5.2.7 Vercel Deployment Configuration (vercel.json)</h3>
+<pre>{
+  "buildCommand":    "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "framework":       "vite",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" }
+  ]
+}</pre>
+
+  <h2>5.3 Application Screen Shots</h2>
+  <p>Table 5.1 describes the key screens of the FoodGenie application. Screenshots should be captured from the running deployment and inserted here before final printing.</p>
+
+  <p class="tbl-caption">Table 5.1: Key Application Screens and Their Descriptions</p>
+  <table class="dt">
+    <tr><th>Screen</th><th>Route</th><th>Description</th></tr>
+    <tr><td>Home Page</td><td>/</td><td>Full-screen hero section with glassmorphism overlays, animated statistics ticker, featured category cards, and AI Genie chatbot trigger button.</td></tr>
+    <tr><td>Menu Page</td><td>/menu</td><td>Category filter tabs, food card grid with Pexels dynamic imagery, star ratings, price tags, and animated "Add to Cart" buttons.</td></tr>
+    <tr><td>AI Recommend</td><td>/recommend</td><td>Structured input form for budget, mood, and dietary preference; AI-generated recommendation card with dish name, description, and price.</td></tr>
+    <tr><td>Build Your Plate</td><td>/build-plate</td><td>Step-based plate builder: select Base, Protein, Side Dish, and Drink components to compose a custom meal.</td></tr>
+    <tr><td>Cart Page</td><td>/cart</td><td>Itemised cart with quantity controls, stock validation badges, price breakdown, and Razorpay checkout button.</td></tr>
+    <tr><td>Order Tracking</td><td>/track-order/:id</td><td>Animated vertical status timeline with status-specific icons, delivery boy details card, and estimated arrival time.</td></tr>
+    <tr><td>Admin Dashboard</td><td>/admin</td><td>KPI stat cards (Revenue, Orders, Users), recent orders table, and quick-action navigation sidebar.</td></tr>
+    <tr><td>Admin – Manage Menu</td><td>/admin/menu</td><td>Searchable, paginated food item table with inline edit and delete controls, and "Add New Item" modal form.</td></tr>
+    <tr><td>User Profile</td><td>/profile</td><td>Avatar, taste mood selector (dynamically applies colour theme), XP progress bar, rank badge display, and recent order quick view.</td></tr>
+  </table>
+
+  <div class="pg-num">23</div>
+</div>
+
+<!-- Screenshots placeholder page -->
+<div class="page">
+  <h2>5.4 Screen Shot Placeholders</h2>
+  <p>Insert actual application screenshots below before submission. Capture screenshots from the live deployment or local development server running at <code>http://localhost:5173</code>.</p>
+
+  <div style="border:2px dashed #aaa; min-height:100pt; display:flex; align-items:center; justify-content:center; margin:10pt 0;">
+    <p style="color:#999; font-size:13pt; text-align:center;">[ Screenshot 1 – Home Page ]<br/>Paste image here</p>
+  </div>
+
+  <div style="border:2px dashed #aaa; min-height:100pt; display:flex; align-items:center; justify-content:center; margin:10pt 0;">
+    <p style="color:#999; font-size:13pt; text-align:center;">[ Screenshot 2 – Menu Page with AI Chatbot ]<br/>Paste image here</p>
+  </div>
+
+  <div style="border:2px dashed #aaa; min-height:100pt; display:flex; align-items:center; justify-content:center; margin:10pt 0;">
+    <p style="color:#999; font-size:13pt; text-align:center;">[ Screenshot 3 – Order Tracking Page ]<br/>Paste image here</p>
+  </div>
+
+  <div style="border:2px dashed #aaa; min-height:80pt; display:flex; align-items:center; justify-content:center; margin:10pt 0;">
+    <p style="color:#999; font-size:13pt; text-align:center;">[ Screenshot 4 – Admin Dashboard ]<br/>Paste image here</p>
+  </div>
+
+  <div class="pg-num">24</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CHAPTER 6 – CONCLUSIONS / FINDINGS / FUTURE SCOPE   Page 27
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="ch-heading">
+    <div class="ch-label">Chapter 6</div>
+    <div class="ch-title">Conclusions / Findings / Future Scope</div>
+  </div>
+
+  <h2>6.1 Conclusions</h2>
+  <p>The FoodGenie project successfully demonstrates the feasibility and value of integrating Large Language Model (LLM) AI capabilities into a production-grade food ordering web application using a modern, full-stack JavaScript technology stack. The following conclusions are drawn from the development, testing, and deployment of the system:</p>
+
+  <ol>
+    <li><strong>AI Integration is Practically Viable:</strong> The Groq API's sub-800ms end-to-end inference latency makes real-time conversational AI a viable feature in consumer web applications, not merely in enterprise or research contexts.</li>
+    <li><strong>MERN Stack Remains Industry-Relevant:</strong> The MongoDB–Express–React–Node.js stack continues to offer an exceptional balance of developer productivity, ecosystem maturity, and deployment flexibility when paired with modern tooling such as Vite, Tailwind CSS, Framer Motion, and Zustand.</li>
+    <li><strong>Premium UI/UX Increases Perceived Value:</strong> The glassmorphism design language and Framer Motion micro-animations created a perceptibly premium user experience, directly differentiating FoodGenie from commodity food ordering templates.</li>
+    <li><strong>Serverless Architecture is Production-Ready for Full-Stack Apps:</strong> Deploying a Node.js/Express backend as Vercel Serverless Functions, combined with MongoDB Atlas connection caching, proved to be a reliable, scalable, and cost-free approach for full-stack student and startup projects.</li>
+    <li><strong>Zero-Cost Cloud Stack is Achievable:</strong> The entire infrastructure — frontend CDN hosting, backend serverless compute, and cloud database — was provisioned and operated at zero monthly cost using free tiers, validating this as a viable model for early-stage applications.</li>
+  </ol>
+
+  <h2>6.2 Findings</h2>
+  <ul>
+    <li>Serverless functions require careful database connection lifecycle management; without the <code>global.mongoose</code> caching pattern, each cold start would open a new MongoDB connection, quickly exhausting the free-tier connection limit.</li>
+    <li>The Groq free-tier API enforces request-per-minute (RPM) limits that must be handled gracefully in the frontend with appropriate loading states and error messages.</li>
+    <li>JWT-based stateless authentication is well-suited to serverless environments where traditional session storage is not available across function instances.</li>
+    <li>Dynamic image sourcing from the Pexels API improves visual richness significantly but introduces an external dependency for rendering food cards; a fallback image strategy is advisable.</li>
+    <li>Framer Motion animations, while visually impactful, can contribute to bundle size; selective import of only used components is recommended for production optimisation.</li>
+  </ul>
+
+  <div class="pg-num">27</div>
+</div>
+
+<!-- Chapter 6 – Page 28 -->
+<div class="page">
+  <h2>6.3 Future Scope</h2>
+  <p>The current version of FoodGenie establishes a robust, feature-rich foundation. The following enhancements are proposed for future development iterations, presented in Table 6.1.</p>
+
+  <p class="tbl-caption">Table 6.1: Proposed Future Enhancements for FoodGenie</p>
+  <table class="dt">
+    <tr><th>Enhancement</th><th>Description</th><th>Priority</th></tr>
+    <tr>
+      <td>Native Mobile Application</td>
+      <td>Develop iOS and Android apps using React Native or Capacitor.js, reusing the existing backend APIs. This would extend the user base significantly.</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>Real-Time WebSocket Updates</td>
+      <td>Replace polling-based order tracking with Socket.io WebSocket connections or Server-Sent Events (SSE) for true, push-based real-time order status delivery.</td>
+      <td>High</td>
+    </tr>
+    <tr>
+      <td>Personalised AI User Profiles</td>
+      <td>Store user interaction and order history as vector embeddings to enable progressively more personalised and context-aware AI recommendations over time.</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>Multi-Restaurant / Multi-Tenant Support</td>
+      <td>Extend the platform to support multiple independent restaurants under a single food court, each with their own admin account, menu, and revenue tracking.</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>Voice Ordering via Speech API</td>
+      <td>Integrate the Web Speech API or OpenAI Whisper to enable voice-based interaction with the Genie chatbot for a hands-free ordering experience.</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>Full Loyalty Programme</td>
+      <td>Expand the XP and rank gamification into a complete loyalty programme featuring redeemable reward points, discount coupons, and tiered membership benefits.</td>
+      <td>Low</td>
+    </tr>
+    <tr>
+      <td>AI-Driven Admin Insights</td>
+      <td>Generate natural language summaries of revenue and order analytics (e.g., "Your best-selling item last week was Paneer Tikka with 42 orders, up 15% from the previous week").</td>
+      <td>Low</td>
+    </tr>
+    <tr>
+      <td>International Payment Support</td>
+      <td>Add Stripe payment gateway alongside Razorpay to support international customers and multi-currency transactions for global market expansion.</td>
+      <td>Low</td>
+    </tr>
+  </table>
+
+  <h2>6.4 Summary</h2>
+  <p>FoodGenie successfully achieves all objectives stated in Chapter 1: a fully functional, AI-powered food ordering and discovery platform, deployed on a production cloud infrastructure at zero operational cost. The project demonstrates that cutting-edge AI capabilities can be meaningfully integrated into full-stack web applications by students, and establishes a strong, extensible foundation for future commercial development. The combination of a premium UI, intelligent AI concierge, and a robust admin system positions FoodGenie as a genuine differentiator in the food technology landscape.</p>
+
+  <div class="pg-num">28</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     BIBLIOGRAPHY   Page 30
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="pre-ch-title">Bibliography</p>
+
+  <h2>Books</h2>
+  <ol>
+    <li style="margin-bottom:8pt;">Flanagan, D. (2020). <em>JavaScript: The Definitive Guide</em> (7th ed.). O'Reilly Media, Inc.</li>
+    <li style="margin-bottom:8pt;">Banks, A., &amp; Porcello, E. (2020). <em>Learning React: Modern Patterns for Developing React Apps</em> (2nd ed.). O'Reilly Media, Inc.</li>
+    <li style="margin-bottom:8pt;">Brown, E. (2019). <em>Web Development with Node and Express: Leveraging the JavaScript Stack</em> (2nd ed.). O'Reilly Media, Inc.</li>
+    <li style="margin-bottom:8pt;">Chodorow, K. (2019). <em>MongoDB: The Definitive Guide</em> (3rd ed.). O'Reilly Media, Inc.</li>
+    <li style="margin-bottom:8pt;">Russell, S., &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach</em> (4th ed.). Pearson Education.</li>
+  </ol>
+
+  <h2>Websites and Online Documentation</h2>
+  <ol start="6">
+    <li style="margin-bottom:8pt;">React Documentation. (2024). <em>React – The library for web and native user interfaces.</em> Retrieved from https://react.dev</li>
+    <li style="margin-bottom:8pt;">MongoDB Inc. (2024). <em>MongoDB Atlas Documentation.</em> Retrieved from https://www.mongodb.com/docs/atlas/</li>
+    <li style="margin-bottom:8pt;">Groq Inc. (2024). <em>Groq API Documentation – Chat Completions.</em> Retrieved from https://console.groq.com/docs/openai</li>
+    <li style="margin-bottom:8pt;">Vercel Inc. (2024). <em>Vercel Documentation – Serverless Functions.</em> Retrieved from https://vercel.com/docs/functions</li>
+    <li style="margin-bottom:8pt;">Razorpay. (2024). <em>Razorpay Payment Gateway Integration Guide.</em> Retrieved from https://razorpay.com/docs/</li>
+    <li style="margin-bottom:8pt;">Framer. (2024). <em>Framer Motion – Production-Ready Animation Library for React.</em> Retrieved from https://www.framer.com/motion/</li>
+    <li style="margin-bottom:8pt;">Tailwind Labs. (2024). <em>Tailwind CSS Documentation.</em> Retrieved from https://tailwindcss.com/docs</li>
+    <li style="margin-bottom:8pt;">Pexels. (2024). <em>Pexels API Documentation.</em> Retrieved from https://www.pexels.com/api/documentation/</li>
+    <li style="margin-bottom:8pt;">JWT.io. (2024). <em>Introduction to JSON Web Tokens.</em> Retrieved from https://jwt.io/introduction</li>
+    <li style="margin-bottom:8pt;">Vite. (2024). <em>Vite – Next Generation Frontend Tooling.</em> Retrieved from https://vite.dev</li>
+    <li style="margin-bottom:8pt;">Pmndrs. (2024). <em>Zustand – Bear Necessities for State Management in React.</em> Retrieved from https://github.com/pmndrs/zustand</li>
+    <li style="margin-bottom:8pt;">MDN Web Docs. (2024). <em>HTTP – HyperText Transfer Protocol.</em> Mozilla Foundation. Retrieved from https://developer.mozilla.org/en-US/docs/Web/HTTP</li>
+    <li style="margin-bottom:8pt;">npm Registry. (2024). <em>bcryptjs – npm package page.</em> Retrieved from https://www.npmjs.com/package/bcryptjs</li>
+    <li style="margin-bottom:8pt;">Statista. (2024). <em>Online Food Delivery – Worldwide Segment Statistics.</em> Retrieved from https://www.statista.com/outlook/dmo/eservices/online-food-delivery/worldwide</li>
+    <li style="margin-bottom:8pt;">GeeksForGeeks. (2024). <em>MERN Stack Tutorial – Build a Full-Stack Web Application.</em> Retrieved from https://www.geeksforgeeks.org/mern-stack/</li>
+  </ol>
+
+  <div class="pg-num">30</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PLAGIARISM REPORT   Page 33
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <p class="pre-ch-title">Plagiarism Report</p>
+
+  <div class="cert-box" style="min-height:300pt; text-align:center; padding:28pt 20pt;">
+    <p style="font-size:14pt;font-weight:bold;margin-bottom:14pt;">Turnitin / iThenticate Originality Report</p>
+
+    <table class="dt" style="width:80%;margin:0 auto 20pt;">
+      <tr><td style="text-align:right;font-weight:bold;">Document Title:</td><td style="text-align:left;">FoodGenie – An AI-Powered Food Court Ordering &amp; Discovery Platform</td></tr>
+      <tr><td style="text-align:right;font-weight:bold;">Author:</td><td style="text-align:left;">Manish Kumar (RISU-CS-2021-0042)</td></tr>
+      <tr><td style="text-align:right;font-weight:bold;">Submission Date:</td><td style="text-align:left;">_______________</td></tr>
+      <tr><td style="text-align:right;font-weight:bold;">Word Count:</td><td style="text-align:left;">Approx. 8,500 words</td></tr>
+      <tr><td style="text-align:right;font-weight:bold;color:#c62828;">Similarity Index:</td><td style="text-align:left;font-weight:bold;color:#c62828;">_______ %</td></tr>
+    </table>
+
+    <p style="font-size:11pt;color:#666;margin-bottom:20pt;">
+      (As per university guidelines, a similarity index of less than 15% is acceptable.)
+    </p>
+
+    <div style="border:2px dashed #bbb; width:90%; margin:0 auto; height:180pt; display:flex; align-items:center; justify-content:center;">
+      <p style="color:#aaa; font-size:13pt; line-height:1.8;">
+        [ Paste Turnitin Originality Report Screenshot Here ]<br/>
+        Include the report generated from your institution's<br/>
+        licensed Turnitin or urkund.com account.
+      </p>
+    </div>
+  </div>
+
+  <p style="margin-top:14pt; font-size:11pt; color:#444; text-align:center;">
+    <em>Note: Attach the complete similarity report printout as Annexure after this page before spiral binding.</em>
+  </p>
+
+  <div class="pg-num">33</div>
+</div>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Lock, User, ArrowRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import useAuthStore from '../store/useAuthStore'
@@ -10,16 +10,24 @@ const Signup = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
   const { register, loading } = useAuthStore()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setErrorMsg('')
     try {
-      await register(fullName, email, password)
-      navigate('/')
+      const success = await register(fullName, email, password)
+      if (success) {
+        navigate('/')
+      } else {
+        const authError = useAuthStore.getState().error
+        setErrorMsg(authError || 'Failed to create account. Please try again.')
+      }
     } catch (error) {
       console.error(error)
+      setErrorMsg(error.response?.data?.message || 'Connection to the server failed.')
     }
   }
 
@@ -46,6 +54,19 @@ const Signup = () => {
               <Logo className="scale-125 mb-4" />
               <h2 className="text-2xl font-black text-white mt-1 mb-1.5 tracking-tight">Create Account</h2>
               <p className="text-white/35 text-sm font-medium">Join FoodGenie for personalized dining.</p>
+
+              <AnimatePresence>
+                {errorMsg && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold"
+                  >
+                    ⚠️ {errorMsg}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Form */}
